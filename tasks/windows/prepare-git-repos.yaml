@@ -37,12 +37,14 @@
     tags: prepare-git-repos
 
   # print zuul-cloner output only when it fails
-  - debug: var=zuul_cloner_out
+  - name: Print zuul output when it fails
+    debug: var=zuul_cloner_out
     when: zuul_cloner_out.rc != 0
     tags: prepare-git-repos
 
   # fail the task if zuul-cloner if necessary
-  - fail:
+  - name: Fail task if zuul cloner had any errors
+    fail:
       msg: "Failed zuul-cloner"
     when: zuul_cloner_out.rc != 0
     tags: prepare-git-repos

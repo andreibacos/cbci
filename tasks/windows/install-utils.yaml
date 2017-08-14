@@ -17,3 +17,11 @@
       src: "{{ win_dir.tmp }}\\utils.zip"
       dest: "{{ win_dir.bin  }}"
     tags: install-utils
+
+  - name: Add utils to PATH
+    cb_path:
+      elements:
+      - "{{ win_dir.bin  }}"
+      state: present
+    tags: install-utils
+
