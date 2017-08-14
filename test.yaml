@@ -1,5 +1,7 @@
 ---
 - hosts: win2016
+  vars_files: 
+    - zuul-params.yaml
 
   tasks:
     - include: tasks/windows/hv2016-node-prep.yaml

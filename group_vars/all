@@ -23,11 +23,3 @@
   win_freerdp_archive_url: https://raw.githubusercontent.com/andreibacos/hypervci-dependencies/master/FreeRDP_powershell.zip
 
   git_server: http://git.openstack.org
-
-  zuul_project: openstack/cinder
-  zuul_ref: refs/zuul/master/Z6966d51215294d9ca4929058615154ea
-  zuul_url: http://144.76.59.195/p
-  zuul_change: 463312
-  zuul_patchset: 5
-  zuul_branch: master
-
