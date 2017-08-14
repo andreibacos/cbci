@@ -5,12 +5,27 @@
       src: files/zuul-clonemap.yaml
     tags: prepare-git-repos 
 
+  - name: "Set zuul-cloner command for head only (no applied change)"
+    set_fact:
+      zuul_cloner_command: 'zuul-cloner --workspace {{ win_dir.build }} -m {{ win_dir.build }}\\clonemap.yaml
+                           --zuul-url {{ zuul_url }} --zuul-branch {{ zuul_branch }}  
+                           {{ git_server }} {{ git_prep_projects | join(" ") }}'
+    when: zuul_head_only and zuul_head_only is defined
+    tags: prepare-git-repos
+
+  - name: "Set zuul-cloner command for project: {{ zuul_project }} ref: {{ zuul_ref }}"
+    set_fact:
+      zuul_cloner_command: 'zuul-cloner --workspace {{ win_dir.build }} -m {{ win_dir.build }}\\clonemap.yaml
+                            --zuul-project {{ zuul_project }} --zuul-ref {{ zuul_ref }}
+                            --zuul-url {{ zuul_url }} --zuul-branch {{ zuul_branch }}  
+                            {{ git_server }} {{ git_prep_projects | join(" ") }}'
+    when: not zuul_head_only or zuul_head_only is not defined
+    tags: prepare-git-repos
+
   # zuul-cloner outputs on stderr, if we redirect 2>&1 the command always fails
   # we disable failure here to be able to write the log file in the next task and fail there if necessary
   - name: Run zuul-cloner
-    win_shell: 'zuul-cloner --workspace {{ win_dir.build }} -m {{ win_dir.build }}\\clonemap.yaml
-                --zuul-project {{ zuul_project }} --zuul-ref {{ zuul_ref }}
-                --zuul-url {{ zuul_url }} --zuul-branch {{ zuul_branch }}  {{ git_server }} {{ git_prep_projects | join(" ") }}'
+    win_shell: "{{ zuul_cloner_command }}"
     register: zuul_cloner_out
     failed_when: False
     tags: prepare-git-repos
