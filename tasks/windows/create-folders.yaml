@@ -1,0 +1,7 @@
+---
+  - name: Create openstack folders
+    win_file:
+      path: "{{ item }}"
+      state: directory
+    with_items: "{{ win_dir.values() }}"
+    tags: create-folders

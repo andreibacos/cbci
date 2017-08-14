@@ -1,0 +1,47 @@
+---
+  - name: Upload zuul clonemap file
+    win_copy:
+      dest: "{{ win_dir.build }}\\clonemap.yaml"
+      src: files/zuul-clonemap.yaml
+    tags: prepare-git-repos 
+
+  # zuul-cloner outputs on stderr, if we redirect 2>&1 the command always fails
+  # we disable failure here to be able to write the log file in the next task and fail there if necessary
+  - name: Run zuul-cloner
+    win_shell: 'zuul-cloner --workspace {{ win_dir.build }} -m {{ win_dir.build }}\\clonemap.yaml
+                --zuul-project {{ zuul_project }} --zuul-ref {{ zuul_ref }}
+                --zuul-url {{ zuul_url }} --zuul-branch {{ zuul_branch }}  {{ git_server }} {{ git_prep_projects | join(" ") }}'
+    register: zuul_cloner_out
+    failed_when: False
+    tags: prepare-git-repos
+
+  - name: Write zuul-cloner log file
+    win_copy: 
+      dest: "{{ win_dir.log }}\\zuul-cloner.log"
+      content: '{{ zuul_cloner_out | to_nice_json }}'
+    tags: prepare-git-repos
+
+  # print zuul-cloner output only when it fails
+  - debug: var=zuul_cloner_out
+    when: zuul_cloner_out.rc != 0
+    tags: prepare-git-repos
+
+  # fail the task if zuul-cloner if necessary
+  - fail:
+      msg: "Failed zuul-cloner"
+    when: zuul_cloner_out.rc != 0
+    tags: prepare-git-repos
+
+  - name: Applying cherry-picks
+    cb_cherry_pick:
+      url: "{{ git_server }}/{{ item.project }}"
+      ref: "{{ item.patches }}"
+      path: "{{ item.path }}"
+    register: cherry_pick_output
+    with_items: "{{ cherry_picks }}"
+    tags: cherry-pick
+
+#  - name: Print cherry-pick task output
+#    debug: var=cherry_pick_output
+#    tags: cherry-pick
+

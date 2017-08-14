@@ -1,0 +1,13 @@
+ansible_ssh_user: administrator
+ansible_ssh_pass: Passw0rd
+ansible_ssh_port: 5986
+ansible_connection: winrm
+ansible_winrm_server_cert_validation: ignore
+
+git_prep_projects: 
+  - openstack/nova
+  - openstack/requirements
+  - openstack/neutron
+  - openstack/os-win
+  - openstack/networking-hyperv
+

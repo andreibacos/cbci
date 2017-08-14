@@ -1,0 +1,19 @@
+---
+  - name: Check if utils archive is present
+    win_stat:
+      path: "{{ win_dir.tmp }}\\utils.zip"
+    register: utils_zip
+    tags: install-utils
+
+  - name: Download utils archive
+    win_get_url:
+      url: "{{ win_utils_bin_archive_url }}"
+      dest: "{{ win_dir.tmp }}\\utils.zip"
+    when: utils_zip.stat.exists == False                
+    tags: install-utils
+
+  - name: Unzip utils archive
+    cb_unzip:
+      src: "{{ win_dir.tmp }}\\utils.zip"
+      dest: "{{ win_dir.bin  }}"
+    tags: install-utils

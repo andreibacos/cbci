@@ -1,0 +1,13 @@
+---
+  - name: Download get-pip.py from "{{ get_pip_url }}"
+    win_get_url:
+      url: "{{ get_pip_url }}"
+      dest: "{{ win_dir.tmp }}\\get-pip.py"
+      force: no
+    tags: install-pip
+
+  - name: Install pip version "{{ pip_version }}"
+    win_shell: python "{{ win_dir.tmp }}\\get-pip.py" "{{ pip_version }}"
+    args:
+      creates: "{{ win_dir.python }}\\lib\\site-packages\\pip"
+    tags: install-pip

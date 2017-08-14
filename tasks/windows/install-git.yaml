@@ -1,0 +1,27 @@
+---
+  - name: Check if git installer is present
+    win_stat: 
+      path: "{{ win_dir.tmp }}\\git-installer.exe"
+    register: git_installer
+    tags: install-git
+
+  - name: Download git installer
+    win_get_url:
+      skip_certificate_validation: true
+      dest: "{{ win_dir.tmp }}\\git-installer.exe"
+      url: "{{ win_git_installer_url }}"
+    when: git_installer.stat.exists == False
+    tags: install-git
+
+  - name: Install git
+    win_shell: "{{ win_dir.tmp }}\\git-installer.exe /silent"
+    args:
+        creates: "c:\\program files\\git\\bin\\git.exe"
+    tags: install-git
+
+  - name: Add git to PATH
+    cb_path:
+      elements:
+      - "c:\\program files\\git\bin"
+      state: present
+    tags: install-git

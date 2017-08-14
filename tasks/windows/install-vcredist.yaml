@@ -1,0 +1,27 @@
+---
+  - name: Check if vcredist_x86 is installed
+    win_shell: Get-WmiObject Win32_Product -Filter "Name LIKE '%Visual C++ 2012 x86%'"
+    register: vcredist_x86_installed
+    changed_when: False
+    tags: vcredist
+
+  - name: Check if vcredist_x86 installer is present
+    win_stat:
+      path: "{{ win_dir.tmp }}\\vcredist_x86.exe"
+    register: vcredist_x86_installer
+    tags: vcredist
+
+  - name: Download vcredist_x86 installer
+    win_get_url:
+      skip_certificate_validation: true
+      dest: "{{ win_dir.tmp }}\\vcredist_x86.exe"
+      url: "{{ win_vcredist_x86_url }}"
+    when: (vcredist_x86_installer.stat.exists == False) and 
+          ('"Microsoft Visual C++ 2012 x86" not in vcredist_x86_installed.stdout')
+    tags: vcredist               
+
+  - name: Install vcredist_x86
+    win_shell: "{{ win_dir.tmp }}\\vcredist_x86.exe /q"
+    when: '"Microsoft Visual C++ 2012 x86" not in vcredist_x86_installed.stdout'
+    tags: vcredist
+

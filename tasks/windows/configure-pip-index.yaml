@@ -1,0 +1,7 @@
+---
+  - name: Configure pip index-url
+    win_copy:
+      dest: "{{ win_dir.pip }}\\pip.ini"
+      content: "{{ pip_ini_content }}"
+    tags: configure-pip-index
+

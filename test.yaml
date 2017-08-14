@@ -1,0 +1,6 @@
+---
+- hosts: win2016
+
+  tasks:
+    - include: tasks/windows/hv2016-node-prep.yaml
+    - include: tasks/windows/prepare-git-repos.yaml

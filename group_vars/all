@@ -1,0 +1,33 @@
+---
+  win_dir:
+    openstack: 'c:\openstack'
+    bin: 'c:\openstack\bin'
+    log: 'c:\openstack\log'
+    etc: 'c:\openstack\etc'
+    build: 'c:\openstack\build'
+    tmp: 'c:\openstack\tmp'
+    python: 'c:\python27'
+    pip: 'C:\ProgramData\pip' 
+
+  get_pip_url: https://bootstrap.pypa.io/get-pip.py
+  pip_version: pip==9.0.1
+  pip_ini_content: "[global]\nindex-url = http://144.76.59.195:8099/cloudbase/CI/+simple/\n[install]\ntrusted-host = 144.76.59.195"
+
+  # we install zuul because we need zuul-cloner for git prep
+  zuul_version: zuul==2.5.2
+
+  win_utils_bin_archive_url: https://raw.githubusercontent.com/andreibacos/hypervci-dependencies/master/utils_bin.zip
+  win_python_archive_url: https://raw.githubusercontent.com/andreibacos/hypervci-dependencies/master/python.zip
+  win_git_installer_url: https://github.com/git-for-windows/git/releases/download/v2.13.2.windows.1/Git-2.13.2-64-bit.exe
+  win_vcredist_x86_url: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe
+  win_freerdp_archive_url: https://raw.githubusercontent.com/andreibacos/hypervci-dependencies/master/FreeRDP_powershell.zip
+
+  git_server: http://git.openstack.org
+
+  zuul_project: openstack/cinder
+  zuul_ref: refs/zuul/master/Z6966d51215294d9ca4929058615154ea
+  zuul_url: http://144.76.59.195/p
+  zuul_change: 463312
+  zuul_patchset: 5
+  zuul_branch: master
+

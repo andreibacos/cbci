@@ -1,0 +1,32 @@
+---
+  - name: Check if FreeRDP archive is present
+    win_stat:
+      path: "{{ win_dir.tmp }}\\FreeRDP_powershell.zip"
+    register: freerdp_zip
+    tags: freerdp
+
+  - name: Download FreeRDP archive
+    win_get_url:
+      url: "{{ win_freerdp_archive_url }}"
+      dest: "{{ win_dir.tmp }}\\FreeRDP_powershell.zip"
+    when: freerdp_zip.stat.exists == False
+    tags: freerdp
+
+  - name: Unzip FreeRDP archive
+    cb_unzip:
+      src: "{{ win_dir.tmp }}\\FreeRDP_powershell.zip"
+      dest: "{{ win_dir.tmp }}"
+    tags: freerdp
+
+  - name: Copy wfreerdp.exe, libeay32.dll and ssleay32.dll to windows folder
+    win_shell: cp "{{win_dir.tmp}}\\FreeRDP\\*" c:\\windows
+    args:
+        creates: "c:\\windows\\wfreerdp.exe"
+    tags: freerdp
+
+  - name: Copy FreeRDP.psm1 to Modules\FreeRDP folder
+    win_shell: cp -recurse "{{win_dir.tmp}}\\FreeRDP" c:\windows\system32\WindowsPowerShell\v1.0\Modules
+    args:
+        creates: "c:\\windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\FreeRDP\\FreeRDP.psm1"
+    tags: freerdp
+
