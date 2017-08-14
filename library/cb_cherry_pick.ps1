@@ -64,13 +64,15 @@ If (-not $check_mode) {
             $fetch_result = Execute-Command -commandTitle "git fetch" -commandPath "git" -commandArguments "-C $path fetch $git_url $r"
             $result.output[$r] = @{}
             $result.output[$r].Add("git fetch", $fetch_result)
-            $cherry_pick_result = Execute-Command -commandTitle "git cherry pick" -commandPath "git" -commandArguments "-C $path cherry-pick FETCH_HEAD"
-            $result.output[$r].Add("git cherry pick", $cherry_pick_result)
-            if (($cherry_pick_result.exitcode) -ne 0) {
-                $cherry_pick_abort_result = Execute-Command -commandTitle "git cherry-pick abort" -commandPath "git" -commandArguments "-C $path cherry-pick --abort"
-                $result.output[$r].Add("git cherry-pick abort", $cherry_pick_abort_result)
-            } else {
-                $result.changed = $true
+            if (($fetch_result.exitcode) -eq 0) {
+                $cherry_pick_result = Execute-Command -commandTitle "git cherry pick" -commandPath "git" -commandArguments "-C $path cherry-pick FETCH_HEAD"
+                $result.output[$r].Add("git cherry pick", $cherry_pick_result)
+                if (($cherry_pick_result.exitcode) -ne 0) {
+                    $cherry_pick_abort_result = Execute-Command -commandTitle "git cherry-pick abort" -commandPath "git" -commandArguments "-C $path cherry-pick --abort"
+                    $result.output[$r].Add("git cherry-pick abort", $cherry_pick_abort_result)
+                } else {
+                    $result.changed = $true
+                }
             }
         }
     }
