@@ -1,5 +1,5 @@
 ---
-- hosts: win2016
+- hosts: hv2016
   vars_files: 
     - zuul-params.yaml
 

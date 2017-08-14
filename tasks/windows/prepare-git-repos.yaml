@@ -56,11 +56,12 @@
       path: "{{ item.path }}"
     register: cherry_pick_output
     with_items: "{{ cherry_picks }}"
+    when: cherry_picks is defined
     tags: cherry-pick
 
   - name: Write cherry-picks log file
     win_copy:
       dest: "{{ win_dir.log }}\\cherry-picks.log"
       content: '{{ cherry_pick_output | to_nice_json }}'
+    when: cherry_picks is defined
     tags: cherry-pick
-
