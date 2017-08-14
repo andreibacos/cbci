@@ -41,7 +41,9 @@
     with_items: "{{ cherry_picks }}"
     tags: cherry-pick
 
-#  - name: Print cherry-pick task output
-#    debug: var=cherry_pick_output
-#    tags: cherry-pick
+  - name: Write cherry-picks log file
+    win_copy:
+      dest: "{{ win_dir.log }}\\cherry-picks.log"
+      content: '{{ cherry_pick_output | to_nice_json }}'
+    tags: cherry-pick
 
