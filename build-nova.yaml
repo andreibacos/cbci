@@ -66,7 +66,7 @@
 
     - name: Create config files
       win_template:
-        src: "{{ item }}"
+        src: "windows/{{ item }}"
         dest: "{{ win_dir.etc }}\\{{ item }}"
       with_items:
         - nova.conf
