@@ -3,27 +3,3 @@ ansible_ssh_pass: Passw0rd
 ansible_ssh_port: 5986
 ansible_connection: winrm
 ansible_winrm_server_cert_validation: ignore
-
-git_prep_projects:
-  - openstack/requirements 
-  - openstack/nova
-  - openstack/neutron
-  - openstack/networking-hyperv
-  - openstack/os-win
-
-services:
-  - nova:
-    name: nova-compute
-    description: OpenStack nova Compute Service
-    binary: "{{ win_dir.python }}\\scripts\\nova-compute.exe"
-    config: "{{ win_dir.etc }}\\nova.conf"
-    template: nova.conf
-
-  - neutron:
-    name: neutron-hyperv-agent
-    description: OpenStack Neutron Hyper-V Agent Service
-    binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
-    config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
-    template: neutron-hyperv-agent.conf
-
-compute_driver: hyperv.driver.HyperVDriver

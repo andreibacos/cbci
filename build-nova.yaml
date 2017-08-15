@@ -1,0 +1,77 @@
+---
+- hosts: hv2016
+  vars_files: 
+    - zuul-params.yaml
+
+  vars:
+    git_prep_projects:
+      - openstack/requirements
+      - openstack/nova
+      - openstack/neutron
+      - openstack/networking-hyperv
+      - openstack/os-win
+
+    services:
+      - nova:
+        name: nova-compute
+        description: OpenStack nova Compute Service
+        binary: "{{ win_dir.python }}\\scripts\\nova-compute.exe"
+        config: "{{ win_dir.etc }}\\nova.conf"
+        template: nova.conf
+
+      - neutron:
+        name: neutron-hyperv-agent
+        description: OpenStack Neutron Hyper-V Agent Service
+        binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
+        config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
+        template: neutron-hyperv-agent.conf
+
+    cherry_picks:
+      - project: openstack/cinder
+        path: "{{ win_dir.build }}\\cinder"
+        patches:
+          - refs/changes/41/403641/4
+          - refs/changes/19/426719/4
+      - project: openstack/os-win
+        path: "{{ win_dir.build }}\\os-win"
+        patches:
+          - refs/changes/41/403641/4
+          - refs/changes/19/426719/4
+
+    compute_driver: hyperv.driver.HyperVDriver
+
+  tasks:
+    - include: tasks/windows/create-folders.yaml
+    - include: tasks/windows/install-utils.yaml
+    - include: tasks/windows/install-python.yaml
+    - include: tasks/windows/install-pip.yaml
+    - include: tasks/windows/configure-pip-index.yaml
+    - include: tasks/windows/install-git.yaml
+    - include: tasks/windows/install-vcredist.yaml
+    - include: tasks/windows/install-freerdp.yaml
+    - include: tasks/windows/install-zuul.yaml
+
+    - include: tasks/windows/prepare-git-repos.yaml
+
+    - name: Update setuptools
+      win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
+
+    - include: tasks/windows/install-project.yaml
+      with_items: "{{ git_prep_projects }}"
+      tags:  install-project
+
+    - include: tasks/windows/create-service.yaml
+      with_items: "{{ services }}"
+      tags: create-service
+
+    - name: Create config files
+      win_template:
+        src: "{{ item }}"
+        dest: "{{ win_dir.etc }}\\{{ item }}"
+      with_items:
+        - nova.conf
+        - neutron-hyperv-agent.conf
+        - policy.json
+      tags: create-configs
+
+

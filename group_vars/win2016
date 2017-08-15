@@ -3,23 +3,3 @@ ansible_ssh_pass: Passw0rd
 ansible_ssh_port: 5986
 ansible_connection: winrm
 ansible_winrm_server_cert_validation: ignore
-
-git_prep_projects: 
-  - openstack/cinder
-  - openstack/requirements
-  - openstack/oslo.concurrency
-  - openstack/os-win
-
-cherry_picks:
-  - project: openstack/cinder
-    path: "{{ win_dir.build }}\\cinder"
-    patches: 
-      - refs/changes/41/403641/4
-      - refs/changes/19/426719/4
-  - project: openstack/os-win
-    path: "{{ win_dir.build }}\\os-win"
-    patches:
-      - refs/changes/41/403641/4
-      - refs/changes/19/426719/4
-
-
