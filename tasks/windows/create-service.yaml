@@ -1,0 +1,14 @@
+---
+  - name: "Check if service {{ item.name }} exists"
+    win_shell: "Get-Service {{ item.name }} -ErrorAction SilentlyContinue"
+    register: service_exists
+    failed_when: False
+    changed_when: service_exists.rc != 0
+    tags: create-service
+
+  - name: "Create service {{ item.name }}"
+    win_shell: "New-Service -Name '{{ item.name }}' -DisplayName '{{ item.name }}' -Description '{{ item.description }}' -StartupType Manual
+                -BinaryPathName '{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}'"
+    when: service_exists.rc != 0
+    register: service_create
+    tags: create-service

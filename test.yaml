@@ -6,3 +6,26 @@
   tasks:
     - include: tasks/windows/hv2016-node-prep.yaml
     - include: tasks/windows/prepare-git-repos.yaml
+
+    - name: Update setuptools
+      win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
+
+    - include: tasks/windows/install-project.yaml
+      with_items: "{{ git_prep_projects }}"
+      tags:  install-project
+
+    - include: tasks/windows/create-service.yaml
+      with_items: "{{ services }}"
+      tags: create-service
+
+    - name: Create config files
+      win_template:
+        src: "{{ item }}"
+        dest: "{{ win_dir.etc }}\\{{ item }}"
+      with_items:
+        - nova.conf
+        - neutron-hyperv-agent.conf
+        - policy.json
+      tags: create-configs
+
+

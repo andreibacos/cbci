@@ -1,0 +1,39 @@
+---
+  - name: Set project folder
+    set_fact:
+      log_file: "{{ win_dir.log }}\\pip-install-{{ item | basename }}.log"
+      project_folder: "{{ win_dir.build }}\\{{ item | basename }}"
+    tags: install-project
+
+  - name: "Get project name from {{ project_folder }}\\setup.cfg"
+    win_shell: 'Select-String -path {{ project_folder }}\\setup.cfg -pattern "^name.*=.*" | % {$_.matches.value.split("=")[1].trim()}'
+    register: project_name_output
+    tags: install-project
+
+  - name: "Set project name to {{ project_name_output.stdout_lines[0] }}"
+    set_fact:
+      project_name: "{{ project_name_output.stdout_lines[0] }}"
+    tags: install-project
+
+#  - name: "Running edit-constraints for {{ project_name }} in {{ project_folder }}"
+#    win_shell: 'edit-constraints {{ win_dir.build }}\\requirements\\upper-constraints.txt -- {{ project_name }}
+#                "-e file://{{ project_folder }}#egg={{ project_name }}"'
+#    when: project_name != "openstack_requirements"
+#    tags: install-project
+
+  - name: "Running edit-constraints for {{ project_name }} in {{ project_folder }}"
+    win_shell: 'edit-constraints {{ win_dir.build }}\\requirements\\upper-constraints.txt -- {{ project_name }} ""'
+    when: project_name != "openstack_requirements"
+    tags: install-project
+
+  - name: "Installing {{ project_name }} from {{ project_folder }}"
+    win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U -e {{ project_folder }}"
+    register: pip_install_output
+    tags: install-project
+
+  - name: "Write log file {{ log_file }}"
+    win_copy:
+      dest: "{{ log_file }}"
+      content: '{{ pip_install_output | to_nice_json }}'
+    tags: install-project
+

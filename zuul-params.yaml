@@ -5,3 +5,4 @@
   zuul_patchset: 5
   zuul_branch: master
   zuul_head_only: false
+  devstack_ip: 192.168.1.1

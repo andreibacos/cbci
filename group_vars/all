@@ -8,6 +8,7 @@
     tmp: 'c:\openstack\tmp'
     python: 'c:\python27'
     pip: 'C:\ProgramData\pip' 
+    instances: 'C:\openstack\instances'
 
   get_pip_url: https://bootstrap.pypa.io/get-pip.py
   pip_version: pip==9.0.1
