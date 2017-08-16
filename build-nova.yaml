@@ -40,6 +40,12 @@
 
     compute_driver: hyperv.driver.HyperVDriver
 
+    # vmswitch will be created on the interface that has ip in the specified subnet
+    vmswitches:
+      - name: br100
+        subnet: 192.168.191.0/24
+        management: True
+
   tasks:
     - include: tasks/windows/create-folders.yaml
     - include: tasks/windows/install-utils.yaml
@@ -60,9 +66,16 @@
       with_items: "{{ git_prep_projects }}"
       tags:  install-project
 
-    - include: tasks/windows/create-service.yaml
+    - name: Create Services
+      win_service:
+        name: "{{ item.name }}"
+        display_name: "{{ item.name }}"
+        description: "{{ item.description}}"
+        state: stopped
+        start_mode: manual
+        path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
       with_items: "{{ services }}"
-      tags: create-service
+      tags: create-services
 
     - name: Create config files
       win_template:
@@ -73,5 +86,14 @@
         - neutron-hyperv-agent.conf
         - policy.json
       tags: create-configs
+
+    - name: Create vmswitches
+      cb_vmswitch:
+        name: "{{ item.name }}"
+        management: "{{ item.management }}"
+        subnet: "{{ item.subnet }}"
+        state: present
+      with_items: "{{ vmswitches }}"
+      tags: create-vmswitch
 
 
