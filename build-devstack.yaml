@@ -11,5 +11,23 @@
       set_fact:
         zuul_head_only: True
       when: not zuul_head_only and zuul_project in head_only_projects
+  
+    - include: configure-sudoers.yaml
 
-    - include: tasks/devstack/build-devstack.yaml
+    - include: run-unstack.yaml
+
+    - include: install-apt-packages.yaml
+    - include: install-pip.yaml
+    - include: configure-pip-index.yaml
+    - include: install-python-packages.yaml
+
+    - include: find-data-port.yaml
+    - include: configure-ovs.yaml
+
+    - include: install-zuul.yaml
+    - include: prepare-git-repos.yaml
+    - include: install-networking-hyperv.yaml
+
+    - include: write-configs.yaml
+
+    - include: run-stack.yaml
