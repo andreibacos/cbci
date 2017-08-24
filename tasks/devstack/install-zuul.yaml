@@ -1,0 +1,6 @@
+  - name: Install zuul version {{ zuul_version }}
+    pip:
+      executable: pip3
+      name: "{{ zuul_version }}"
+    become: True
+

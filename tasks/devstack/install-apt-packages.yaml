@@ -1,0 +1,6 @@
+  - name: Install required packages
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+    become: True
+    with_items: "{{ apt_packages }}"

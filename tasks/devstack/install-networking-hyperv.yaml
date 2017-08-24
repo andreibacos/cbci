@@ -1,0 +1,7 @@
+  - name: Install networking-hyperv
+    pip:
+      executable: pip2
+      name: -e /opt/stack/networking-hyperv
+      extra_args: -c /opt/stack/requirements/upper-constraints.txt
+    become: True
+    tags: networking-hyperv

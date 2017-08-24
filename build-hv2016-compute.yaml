@@ -1,0 +1,74 @@
+---
+- hosts: windows
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+    - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
+      include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
+
+    - name: Configure head only for project {{ zuul_project }}
+      set_fact:
+        zuul_head_only: True
+      when: not zuul_head_only and zuul_project in head_only_projects
+
+    - name: Create services and/or stop them if they are running
+      win_service:
+        name: "{{ item.name }}"
+        display_name: "{{ item.name }}"
+        description: "{{ item.description}}"
+        state: stopped
+        start_mode: manual
+        path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
+      with_items: "{{ services }}"
+      tags: create-services
+   
+    - name: Create vmswitches
+      cb_vmswitch:
+        name: "{{ item.name }}"
+        management: "{{ item.management }}"
+        subnet: "{{ item.subnet }}"
+        state: present
+      with_items: "{{ vmswitches }}"
+      when: vmswitches is defined
+      tags: create-vmswitch
+ 
+    - include: tasks/windows/create-folders.yaml
+    - include: tasks/windows/install-utils.yaml
+    - include: tasks/windows/install-python.yaml
+    - include: tasks/windows/install-pip.yaml
+    - include: tasks/windows/configure-pip-index.yaml
+    - include: tasks/windows/install-git.yaml
+    - include: tasks/windows/install-vcredist.yaml
+    - include: tasks/windows/install-freerdp.yaml
+    - include: tasks/windows/install-zuul.yaml
+    - include: tasks/windows/prepare-git-repos.yaml
+    
+    - name: Update setuptools
+      win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
+    
+    - include: tasks/windows/install-project.yaml
+      with_items: "{{ git_prep_projects }}"
+      tags:  install-project
+    
+    - name: Create config files
+      win_template:
+        src: "windows/{{ item }}"
+        dest: "{{ win_dir.etc }}\\{{ item }}"
+      with_items:
+        - nova.conf
+        - neutron-hyperv-agent.conf
+        - policy.json
+      tags: create-configs
+     
+    - name: Start services
+      win_service:
+        name: "{{ item.name }}"
+        display_name: "{{ item.name }}"
+        description: "{{ item.description}}"
+        state: started
+        start_mode: manual
+        path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
+      with_items: "{{ services }}"
+      tags: start-services
+

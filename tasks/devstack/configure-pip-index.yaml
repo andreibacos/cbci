@@ -1,0 +1,6 @@
+  - name: Configure pip index-url
+    copy:
+      content: "{{ pip_ini_content }}"
+      dest: /etc/pip.conf
+    become: True
+    tags: configure-pip-index

@@ -1,0 +1,14 @@
+  - name: Check if unstack.sh exists
+    stat:
+      path: "{{ devstack_dir.devstack }}/unstack.sh"
+    register: unstack_sh
+    tags: stack
+
+  - name: Run unstack if necessary
+    shell: ./unstack.sh > /dev/null 2>&1
+    args:
+      chdir: "{{ devstack_dir.devstack }}"
+    when: unstack_sh.stat.exists and unstack_sh.stat.executable
+    ignore_errors: yes
+    tags: stack
+

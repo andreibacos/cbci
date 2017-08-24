@@ -1,0 +1,13 @@
+  - name: Download get-pip.py from {{ get_pip_url }}
+    get_url:
+      url: "{{ get_pip_url }}"
+      dest: /tmp/get-pip.py
+    tags: install-pip
+
+  - name: Install pip version {{ pip_version }}
+    shell: "{{ item }} /tmp/get-pip.py {{ pip_version }}"
+    become: True
+    with_items:
+      - python2.7
+      - python3
+    tags: install-pip

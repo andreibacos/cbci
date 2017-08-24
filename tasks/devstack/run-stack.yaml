@@ -1,0 +1,27 @@
+  - name: Run stack
+    shell: |
+      ./unstack.sh > /dev/null 2>&1
+      ./stack.sh > /dev/null 2>&1
+    args:
+      chdir: "{{ devstack_dir.devstack }}"
+    register: stack_result
+    until: stack_result.rc == 0
+    retries: 3
+    delay: 5
+    ignore_errors: yes
+    tags: stack
+
+  - name: Get last 35 lines from stack.sh.log
+    shell: tail -35 /opt/stack/logs/stack.sh.log
+    register: stack_log
+    tags: stack
+
+  - name: Show last 35 lines from stack.sh.log
+    debug: var=stack_log
+    tags: stack
+
+  - fail:
+      msg: "Failed stack"
+    when: stack_result.rc != 0
+    tags: stack
+

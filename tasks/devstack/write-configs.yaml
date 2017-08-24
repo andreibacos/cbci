@@ -1,0 +1,15 @@
+  - name: Write keystonerc file
+    copy:
+      content: "{{ keystonerc }}"
+      dest: /home/ubuntu/keystonerc
+    tags: keystonerc
+
+  - name: Write devstack configs
+    template:
+      src: "devstack/{{ item }}"
+      dest: "{{ devstack_dir.devstack }}/{{ item }}"
+    with_items:
+      - local.conf
+      - local.sh
+    tags: write-configs
+

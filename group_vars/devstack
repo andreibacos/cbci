@@ -1,0 +1,46 @@
+########################################################################################################################################
+# devstack specific vars
+########################################################################################################################################
+ansible_ssh_user: ubuntu
+ansible_become_pass: "{{ ansible_ssh_pass }}"
+ansible_python_interpreter: /usr/bin/python3
+
+# When building for a project in this list always fetch HEAD only, do not apply zuul_patch
+head_only_projects:
+  - openstack/cinder
+
+devstack_dir:
+  home: '/home/ubuntu'
+  devstack: '/home/ubuntu/devstack'
+  stack: '/opt/stack'
+
+devstack_repo: https://github.com/openstack-dev/devstack.git
+
+keystonerc: |
+  export OS_USERNAME=admin
+  export OS_TENANT_NAME=admin
+  export OS_PASSWORD=Passw0rd
+  export OS_AUTH_URL=http://127.0.0.1/identity
+
+apt_packages:
+  - python2.7
+  - openvswitch-switch
+  - htop
+  - gcc
+  - python2.7-dev
+  - python3-dev
+
+python_packages:
+  - netaddr
+  - netifaces
+
+git_prep_projects:
+  - openstack/keystone
+  - openstack/glance
+  - openstack/cinder  
+  - openstack/requirements
+  - openstack/nova
+  - openstack/neutron
+  - openstack/networking-hyperv
+  - openstack/swift
+  - openstack/tempest

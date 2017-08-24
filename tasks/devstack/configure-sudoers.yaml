@@ -1,0 +1,8 @@
+- name: Make sure sudo group does not require password
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%sudo\s'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
+  become: True

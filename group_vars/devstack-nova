@@ -1,0 +1,131 @@
+#cherry_picks:
+#  - project: openstack/cinder
+#    path: "{{ devstack_dir.stack }}/cinder"
+#    patches:
+#      - refs/changes/41/403641/4
+#      - refs/changes/19/426719/4
+#  - project: openstack/os-win
+#    path: "{{ devstack_dir.stack }}/os-win"
+#    patches:
+#      - refs/changes/41/403641/4
+#      - refs/changes/19/426719/4
+
+local_conf:
+  enable_services:
+    - rabbit
+    - mysql
+    - key
+    - n-api
+    - n-crt
+    - n-cond
+    - n-sch
+    - n-cauth
+    - neutron
+    - q-svc
+    - q-agt
+    - q-dhcp
+    - q-l3
+    - q-meta
+    - q-metering
+    - q-vpn
+    - g-api
+    - g-reg
+    - cinder
+    - c-api
+    - c-vol
+    - c-sch
+    - c-bak
+    - s-proxy
+    - s-object
+    - s-container
+    - s-account
+    - heat
+    - h-api
+    - h-api-cfn
+    - h-api-cw
+    - h-eng
+    - ceilometer-acentral
+    - ceilometer-acompute
+    - ceilometer-collector
+    - ceilometer-api
+    - ceilometer-anotification
+    - tempest
+
+  disable_services:
+    - n-obj
+    - n-novnc
+    - n-net
+    - n-cpu
+    - q-lbaas
+    - q-fwaas
+    - horizon
+
+  ip_version: 4
+  live_migration: False
+  block_migration: False
+  tenant_vlan_range: "500:1000"
+  image_urls: http://144.76.59.195:8088/cirros-0.3.3-x86_64.vhdx
+  append: |
+    SWIFT_REPLICAS=1
+    SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5d2014f6
+    SWIFT_START_ALL_SERVICES=False
+
+    [[post-config|$NOVA_CONF]]
+    [DEFAULT]
+    force_config_drive = True
+    scheduler_default_filters=RetryFilter,AvailabilityZoneFilter,RamFilter,DiskFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter,DifferentHostFilter,SameHostFilter
+    [glance]
+    use_glance_v1=False
+    [oslo_messaging_rabbit]
+    heartbeat_timeout_threshold = 600
+    heartbeat_rate = 3 
+    [placement]
+    os_region_name = RegionOne
+    project_domain_name = Default
+    project_name = service
+    user_domain_name = Default
+    password = Passw0rd
+    username = placement
+    auth_url = http://{{ devstack_ip }}/identity
+    auth_type = password
+    
+    [[post-config|$NEUTRON_CONF]]
+    [database]
+    min_pool_size = 5
+    max_pool_size = 50
+    max_overflow = 50
+    [quotas]
+    quota_network = 100
+    quota_subnet = 100
+    quota_port = 500
+    quota_security_group = 100
+    quota_security_group_rule = 100
+    quota_vip = 100
+    quota_pool = 100
+    quota_loadbalancer = 100
+    quota_router = 100
+    quota_floatingip = 50
+    quota_firewall = 10
+    quota_firewall_policy = 10
+    quota_firewall_rule = 100
+    
+    [[post-config|$CINDER_CONF]]
+    [lvmdriver-1]
+    lvm_max_over_subscription_ratio = 40.0
+    image_volume_cache_enabled = False
+    lvm_type = default
+    [DEFAULT]
+    quota_volumes = 10
+    quota_snapshots = 10
+    quota_gigabytes = 1000
+    quota_backups = 10
+    quota_backup_gigabytes = 1000
+    
+    [[post-config|/$Q_PLUGIN_CONF_FILE]]
+    [securitygroup]
+    enable_security_group = True
+    # Note(lpetrut): For some reason, the br-int controller is
+    # unaccessible, so we'll stick with ovs-ofctl until we find
+    # out what's wrong.
+    [ovs]
+    of_interface = ovs-ofctl
