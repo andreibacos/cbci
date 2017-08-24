@@ -6,12 +6,7 @@
   tasks:
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
-
-    - name: Configure devstack head only for project {{ zuul_project }}
-      set_fact:
-        zuul_head_only: True
-      when: not zuul_head_only and zuul_project in head_only_projects
-  
+ 
     - include: configure-sudoers.yaml
 
     - include: run-unstack.yaml

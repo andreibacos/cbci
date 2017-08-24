@@ -4,13 +4,12 @@
     - zuul-params.yaml
 
   tasks:
+    - name: Include variables from group_vars/hv2016-compute
+      include_vars: "group_vars/hv2016-compute"
+
     - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
       include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
-
-    - name: Configure head only for project {{ zuul_project }}
-      set_fact:
-        zuul_head_only: True
-      when: not zuul_head_only and zuul_project in head_only_projects
+      failed_when: False
 
     - name: Create services and/or stop them if they are running
       win_service:
