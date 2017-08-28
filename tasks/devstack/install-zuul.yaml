@@ -1,6 +1,8 @@
+  # Install zuul in a virtualenv, it messes with pbr and other openstack libraries
   - name: Install zuul version {{ zuul_version }}
     pip:
-      executable: pip3
+      virtualenv: "{{ devstack_dir.zuul }}"
       name: "{{ zuul_version }}"
+      virtualenv_python: python2.7
     become: True
-
+    tags: install-zuul

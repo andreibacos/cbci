@@ -7,22 +7,22 @@
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
  
-    - include: configure-sudoers.yaml
+    - include: tasks/devstack/configure-sudoers.yaml
 
-    - include: run-unstack.yaml
+    - include: tasks/devstack/run-unstack.yaml
 
-    - include: install-apt-packages.yaml
-    - include: install-pip.yaml
-    - include: configure-pip-index.yaml
-    - include: install-python-packages.yaml
+    - include: tasks/devstack/install-apt-packages.yaml
+    - include: tasks/devstack/install-pip.yaml
+    - include: tasks/devstack/configure-pip-index.yaml
+    - include: tasks/devstack/install-python-packages.yaml
 
-    - include: find-data-port.yaml
-    - include: configure-ovs.yaml
+    - include: tasks/devstack/find-data-port.yaml
+    - include: tasks/devstack/configure-ovs.yaml
 
-    - include: install-zuul.yaml
-    - include: prepare-git-repos.yaml
-    - include: install-networking-hyperv.yaml
+    - include: tasks/devstack/install-zuul.yaml
+    - include: tasks/devstack/prepare-git-repos.yaml
+    - include: tasks/devstack/install-networking-hyperv.yaml
 
-    - include: write-configs.yaml
+    - include: tasks/devstack/write-configs.yaml
 
-    - include: run-stack.yaml
+    - include: tasks/devstack/run-stack.yaml

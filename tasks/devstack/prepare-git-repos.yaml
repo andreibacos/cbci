@@ -13,7 +13,7 @@
 
   - name: "Set zuul-cloner command for head only (no applied change)"
     set_fact:
-      zuul_cloner_command: 'zuul-cloner --workspace {{ devstack_dir.stack }} -m {{ devstack_dir.home }}/clonemap.yaml
+      zuul_cloner_command: '{{ devstack_dir.zuul }}/bin/zuul-cloner --workspace {{ devstack_dir.stack }} -m {{ devstack_dir.home }}/clonemap.yaml
                            --zuul-url {{ zuul_url }} --zuul-branch {{ zuul_branch }}  
                            {{ git_server }} {{ git_prep_projects | join(" ") }}'
     when: zuul_head_only and zuul_head_only is defined
@@ -21,7 +21,7 @@
 
   - name: "Set zuul-cloner command for project: {{ zuul_project }} ref: {{ zuul_ref }}"
     set_fact:
-      zuul_cloner_command: 'zuul-cloner --workspace {{ devstack_dir.stack }} -m {{ devstack_dir.home }}/clonemap.yaml
+      zuul_cloner_command: '{{ devstack_dir.zuul }}/bin/zuul-cloner --workspace {{ devstack_dir.stack }} -m {{ devstack_dir.home }}/clonemap.yaml
                             --zuul-project {{ zuul_project }} --zuul-ref {{ zuul_ref }}
                             --zuul-url {{ zuul_url }} --zuul-branch {{ zuul_branch }}  
                             {{ git_server }} {{ git_prep_projects | join(" ") }}'

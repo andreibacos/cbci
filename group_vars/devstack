@@ -9,6 +9,7 @@ devstack_dir:
   home: '/home/ubuntu'
   devstack: '/home/ubuntu/devstack'
   stack: '/opt/stack'
+  zuul: '/opt/stack/zuul-venv'
 
 devstack_repo: https://github.com/openstack-dev/devstack.git
 
@@ -27,6 +28,7 @@ apt_packages:
   - python3-dev
 
 python_packages:
+  - virtualenv
   - netaddr
   - netifaces
 
