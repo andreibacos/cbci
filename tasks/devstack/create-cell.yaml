@@ -1,0 +1,8 @@
+- name: Create cell
+  shell: |
+    source /home/ubuntu/keystonerc
+    url=$(grep transport_url /etc/nova/nova-dhcpbridge.conf | head -1 | awk '{print $3}')
+    nova-manage cell_v2 simple_cell_setup --transport-url $url > /opt/stack/logs/create_cell.log
+  args:
+    executable: /bin/bash
+

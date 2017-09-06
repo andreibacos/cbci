@@ -1,0 +1,25 @@
+    - name: Check if neutron agents are up, looking for {{ hv2016_compute_nodes | length }} compute nodes
+      shell: |
+        source /home/ubuntu/keystonerc
+        NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)")
+        if [ $NEUTRON_COUNT -ne "{{ hv2016_compute_nodes | length }}" ];then
+            neutron agent-list
+            exit 1
+        fi
+        neutron agent-list
+      args:
+        executable: /bin/bash
+      register: neutron_service_check
+      until: neutron_service_check.rc == 0
+      retries: "{{ service_check_retries }}"
+      delay: "{{ service_check_delay }}"
+      ignore_errors: yes
+
+    - name: Show neutron agents output
+      debug: var=neutron_service_check.stdout_lines
+
+    - name: Fail when neutron agents are down
+      fail:
+        msg: "Neutron agents are down"
+      when: neutron_service_check.rc != 0
+

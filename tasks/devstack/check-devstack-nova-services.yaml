@@ -1,0 +1,24 @@
+    - name: Check if nova services are up, looking for {{ hv2016_compute_nodes | length }} compute nodes
+      shell: |
+        source /home/ubuntu/keystonerc
+        NOVA_COUNT=$(nova service-list | grep nova-compute | grep enabled | grep -c -w up)
+        if [ $NOVA_COUNT -ne "{{ hv2016_compute_nodes | length }}" ];then
+            nova service-list
+            exit 1
+        fi
+        nova service-list
+      args:
+        executable: /bin/bash
+      register: nova_service_check
+      until: nova_service_check.rc == 0
+      retries: "{{ service_check_retries }}"
+      delay: "{{ service_check_delay }}"
+      ignore_errors: yes
+
+    - name: Show nova services output
+      debug: var=nova_service_check.stdout_lines
+
+    - name: Fail when nova-compute services are down
+      fail:
+        msg: "nova-compute services are down"
+      when: nova_service_check.rc != 0

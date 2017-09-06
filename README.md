@@ -8,16 +8,18 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You will need 2 or more machines each with 2 network interfaces in different subnets
+You will need 2 machines if live migration is not required.
 
-One will be used for management and the other for data network, just make sure both interfaces have IPs set
+For live migration two or more compute nodes and active directory are required.
 
-For this example i will be using 2 VMs in VMware Workstation
+For this example i will be using 4 VMs in VMware Workstation
 
-* ubuntu 16.04 - 1 NAT interface and one VMnet1 (host only)
-* Hyper-V 2016 - 1 NAT interface and one VMnet1 (host only)
+* ubuntu 16.04 devstack - 1 NAT interface and one VMnet1 (host only)
+* Hyper-V 2016 compute - 1 NAT interface and one VMnet1 (host only)
+* Hyper-V 2016 compute - 1 NAT interface and one VMnet1 (host only)
+* Server 2016 active directory - 1 NAT interface
 * management network 192.168.171.0/24
-* data network 192.168.112.0/24 (host only)
+* data network 192.168.112.0/24 VMnet1 (host only)
 
 
 ### Installing
@@ -34,7 +36,6 @@ $ sudo apt-get install ansible
 3. Change zuul-params.yaml
 ```
 zuul_head_only: true means no change will be applied on top of zuul-branch
-devstack_ip will be used to configure services on the compute node(s)
 ```
 
 4. Change group variables in group_vars folder to your liking. (ie: ssh/winrm password)
@@ -50,7 +51,7 @@ ansible -i inventory devstack -m ping
     "ping": "pong"
 }
 
-ansible -i inventory windows -m win_ping
+ansible -i inventory ad -m win_ping
 192.168.171.139 | SUCCESS => {
     "changed": false, 
     "ping": "pong"
@@ -58,15 +59,23 @@ ansible -i inventory windows -m win_ping
 
 ```
 
-## Running ansible
+7. (Optional) Create snapshots for all VMs to be able to revert and run the build again
+
+## Running ansible examples
 ```
 ansible-playbook -i inventory build-devstack.yaml
 ansible-playbook -i inventory build-hv2016-compute.yaml
+ansible-playbook -i inventory build-ad.yaml
 ```
 
 or
 
-Using the parallel_task_runner.py
+Using the parallel_task_runner.py (takes care of killing all other unfinished tasks if one fails)
 ```
-python3 parallel_task_runner.py --tasks '{"Build devstack": {"cmd": "ansible-playbook -i inventory build-devstack.yaml", "log": "dvsm.log"}, "Build compute": {"cmd": "ansible-playbook -i inventory build-hv2016-compute.yaml", "log": "hv.log"}}'
+python3 parallel_task_runner.py --tasks '{"Build devstack": {"cmd": "ansible-playbook -i inventory build-devstack.yaml", "log": "dvsm.log"}, "Build compute": {"cmd": "ansible-playbook -i inventory build-hv2016-compute.yaml", "log": "hv.log"}, "Build ad": {"cmd": "ansible-playbook -i inventory build-ad.yaml", "log": "ad.log"}}'
+```
+
+## Running the tests
+```
+ansible-playbook -i inventory post-stack.yaml
 ```

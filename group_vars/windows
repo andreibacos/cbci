@@ -2,11 +2,6 @@
 # windows specific variables
 ########################################################################################################################################
 
-ansible_ssh_user: administrator
-ansible_ssh_port: 5986
-ansible_connection: winrm
-ansible_winrm_server_cert_validation: ignore
-
 win_dir:
   openstack: 'c:\openstack'
   bin: 'c:\openstack\bin'
@@ -23,3 +18,10 @@ win_python_archive_url: https://raw.githubusercontent.com/andreibacos/hypervci-d
 win_git_installer_url: https://github.com/git-for-windows/git/releases/download/v2.13.2.windows.1/Git-2.13.2-64-bit.exe
 win_vcredist_x86_url: http://download.microsoft.com/download/1/6/B/16B06F60-3B20-4FF2-B699-5E9B7962F9AE/VSU_4/vcredist_x86.exe
 win_freerdp_archive_url: https://raw.githubusercontent.com/andreibacos/hypervci-dependencies/master/FreeRDP_powershell.zip
+
+ad_domain: cbci.local
+# extra DNS servers besides the domain controller
+dns_servers: 
+  - 8.8.8.8
+  - 4.4.4.4
+join_ad: True

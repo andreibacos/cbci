@@ -6,6 +6,7 @@
   tasks:
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
+      tags: always
  
     - include: tasks/devstack/configure-sudoers.yaml
 

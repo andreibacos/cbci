@@ -1,6 +1,9 @@
-[windows]
-#192.168.171.135
-192.168.171.139
+[ad]
+192.168.171.132 hostname=ad
+
+[hv2016-compute]
+192.168.171.136 hostname=compute2
+192.168.171.133 hostname=compute1
 
 [devstack]
 192.168.171.134

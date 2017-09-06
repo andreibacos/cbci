@@ -1,15 +1,30 @@
 ---
-- hosts: windows
+- hosts: hv2016-compute
   vars_files: 
     - zuul-params.yaml
+    - group_vars/windows
 
   tasks:
-    - name: Include variables from group_vars/hv2016-compute
-      include_vars: "group_vars/hv2016-compute"
-
     - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
       include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
       failed_when: False
+      tags: always
+
+    # Run sanity checks as early as possible
+    - include: tasks/windows/sanity-checks.yaml
+
+    - name: Configure hostname
+      win_shell: (Rename-Computer -NewName "{{ hostname }}" -passthru).hassucceeded
+      when: hostname is defined and ansible_hostname != hostname|upper
+      register: change_hostname
+      failed_when: False
+      tags: set-hostname
+
+    - name: Reboot after hostname change if necessary
+      win_reboot:
+      when: (change_hostname.skipped is defined and not change_hostname.skipped) or
+            (change_hostname.changed is defined and change_hostname.changed)
+      tags: set-hostname
 
     - name: Create services and/or stop them if they are running
       win_service:
@@ -31,7 +46,7 @@
       with_items: "{{ vmswitches }}"
       when: vmswitches is defined
       tags: create-vmswitch
- 
+
     - include: tasks/windows/create-folders.yaml
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml
@@ -60,14 +75,8 @@
         - policy.json
       tags: create-configs
      
-    - name: Start services
+    - name: Start iscsi service
       win_service:
-        name: "{{ item.name }}"
-        display_name: "{{ item.name }}"
-        description: "{{ item.description}}"
+        name: msiscsi
         state: started
-        start_mode: manual
-        path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
-      with_items: "{{ services }}"
-      tags: start-services
-
+        start_mode: auto

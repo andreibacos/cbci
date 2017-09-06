@@ -1,0 +1,6 @@
+# Various sanity checks before we start building
+- name: Check if we have atleast 1 AD server in the inventory when join_ad is True
+  fail:
+    msg: "join_ad is True but there are no hosts in 'ad' group, either add atleast one active directory server or set join_ad to False"
+  when: join_ad is defined and join_ad and ((groups['ad'] is not defined) or (groups['ad'] | length) == 0)
+

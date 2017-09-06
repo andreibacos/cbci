@@ -1,0 +1,9 @@
+- name: Enable Live migration
+  win_shell: Enable-VMMigration -passthru -ErrorAction silentlycontinue
+
+- name: Set use any network for migration
+  win_shell: Set-VMHost -useanynetworkformigration $true -passthru -ErrorAction silentlycontinue
+
+- name: Set migration auth kerberos
+  win_shell: Set-VMHost -VirtualMachineMigrationAuthenticationType Kerberos -passthru -ErrorAction silentlycontinue
+

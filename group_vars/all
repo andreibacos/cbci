@@ -22,3 +22,6 @@ zuul_version: zuul==2.5.2
 # the inteface in this subnet will be used when creating vmswitches and ovs bridges
 data_network: 192.168.112.0/24
 data_bridge: br-data
+
+hv2016_compute_nodes: "{{ groups['hv2016-compute'] }}"
+devstack_ip: "{{ groups['devstack'][0] }}"

@@ -1,0 +1,88 @@
+---
+- hosts: hv2016-compute
+  vars_files:
+    - zuul-params.yaml
+    - group_vars/windows
+
+  tasks:
+    - include: tasks/windows/join-ad.yaml
+      when: join_ad is defined and join_ad
+
+    - include: tasks/windows/enable-live-migration.yaml
+      when: join_ad is defined and join_ad
+
+    - name: Configure services with AD user
+      set_fact:
+        service_username: "administrator@{{ ad_domain }}"
+      when: join_ad is defined and join_ad
+
+    - name: Configure services with local user
+      set_fact:
+        service_username: "administrator"
+      when: join_ad is not defined or not join_ad
+ 
+    - name: Start services
+      win_service:
+        name: "{{ item.name }}"
+        display_name: "{{ item.name }}"
+        description: "{{ item.description }}"
+        username: "{{ service_username }}"
+        password: "{{ ansible_ssh_pass }}"
+        state: started
+        start_mode: auto
+        path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
+      with_items: "{{ services }}"
+      tags: start-services
+
+- hosts: devstack
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
+      tags: always 
+
+    - include: tasks/devstack/check-devstack-nova-services.yaml
+    - include: tasks/devstack/check-devstack-neutron-services.yaml
+    - include: tasks/devstack/discover-hosts.yaml
+
+    - name: Restart nova api
+      service:
+        name: devstack@n-api
+        state: restarted
+      become: True
+
+    - name: Create folder {{ devstack_dir.home }}/tempest
+      file:
+        path: "{{ devstack_dir.home }}/tempest"
+        state: directory
+        mode: 0755
+      tags: run-tests
+
+    - name: Write test list files under {{ devstack_dir.home }}
+      copy:
+        content: "{{ item.value }}"
+        dest: "{{ devstack_dir.home }}/{{ item.key }}.txt"
+      with_dict: "{{ tempest_tests }}"
+      tags: run-tests
+
+    - name: Upload run-tests.sh
+      copy:
+        src: files/run-tests.sh
+        dest: "{{ devstack_dir.home }}/run-tests.sh"
+        mode: 0755
+      tags: run-tests
+
+    - name: Run tests
+      shell: |
+        {{ devstack_dir.home }}/run-tests.sh \
+        --included-tests {{ devstack_dir.home }}/included-tests.txt \
+        --excluded-tests {{ devstack_dir.home }}/excluded-tests.txt \
+        --isolated-tests {{ devstack_dir.home }}/isolated-tests.txt \
+        > {{ devstack_dir.home }}/tempest/run-tests.sh.log
+      failed_when: False
+      register: tempest_result
+      tags: run-tests
+
+    - debug: var=tempest_result

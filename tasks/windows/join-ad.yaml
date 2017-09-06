@@ -1,0 +1,42 @@
+  - name: Get list of network adapters excluding loopback
+    win_shell: (Get-NetIPAddress -addressfamily ipv4).interfacealias -notlike "Loopback*"
+    register: net_adapters
+    tags: join-ad
+
+  - name: Add AD ip as DNS server
+    win_dns_client:
+      adapter_names: "{{ item }}"
+      ipv4_addresses: "{{ groups['ad'] + dns_servers }}"
+    with_items: "{{ net_adapters.stdout_lines }}"
+    tags: join-ad
+
+  - win_domain_membership:
+      dns_domain_name: "{{ ad_domain }}"
+      hostname: "{{ hostname }}"
+      domain_admin_user: "administrator@{{ ad_domain }}"
+      domain_admin_password: "{{ ansible_ssh_pass }}"
+      state: domain
+    register: domain_state
+    until: domain_state.rc is not defined or domain_state.rc == 0
+    retries: 3
+    delay: 5
+    ignore_errors: yes
+    tags: join-ad
+
+  - name: Failed domain join
+    fail:
+      msg: "Failed join domain" 
+    when: domain_state.rc is defined and domain_state.rc != 0
+    tags: join-ad
+
+  - name: Reboot after domain join
+    win_reboot:
+    when: domain_state.reboot_required is defined and domain_state.reboot_required
+    tags: join-ad
+
+  - name: Add SeServiceLogonRight permission to domain user
+    win_shell: "{{ win_dir.bin }}\\SetUserAccountRights.exe -g administrator@{{ ad_domain }} -v SeServiceLogonRight"
+
+##RemoveMe: domain admins group is already a part of local administrators
+#  - name: Add domain user to local Administrators group
+#    win_shell: "Add-LocalGroupMember -Group Administrators -Member administrator@{{ ad_domain }}"

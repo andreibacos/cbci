@@ -5,6 +5,10 @@ ansible_ssh_user: ubuntu
 ansible_become_pass: "{{ ansible_ssh_pass }}"
 ansible_python_interpreter: /usr/bin/python3
 
+# used for checking if services are up (tasks/devstack/check-devstack-nova-services.yaml)
+service_check_retries: 12
+service_check_delay: 10
+
 devstack_dir:
   home: '/home/ubuntu'
   devstack: '/home/ubuntu/devstack'

@@ -1,0 +1,16 @@
+- hosts: ad
+  gather_facts: yes
+  vars_files: 
+    - zuul-params.yaml
+    - group_vars/windows
+
+  tasks:
+  - name: Configure AD domain {{ ad_domain }}
+    win_domain:
+      dns_domain_name: "{{ ad_domain }}"
+      safe_mode_password: "{{ ansible_ssh_pass }}"
+    register: ad_create
+
+  - name: Reboot after creating domain
+    win_reboot:
+    when: ad_create.reboot_required is defined and ad_create.reboot_required
