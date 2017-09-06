@@ -79,3 +79,8 @@ python3 parallel_task_runner.py --tasks '{"Build devstack": {"cmd": "ansible-pla
 ```
 ansible-playbook -i inventory post-stack.yaml
 ```
+
+Check log files are in /home/ubuntu/tempest on devstack node
+```
+tail -f /home/ubuntu/tempest/run-tests.sh.log
+```
