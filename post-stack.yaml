@@ -74,6 +74,12 @@
         mode: 0755
       tags: run-tests
 
+    - name: Run post stack bash script
+      shell: "{{ post_stack_bash }}"
+      args:
+        executable: /bin/bash
+      tags: post-stack-bash
+
     - name: Run tests
       shell: |
         {{ devstack_dir.home }}/run-tests.sh \
