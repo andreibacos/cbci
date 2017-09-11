@@ -1,0 +1,30 @@
+ansible_ssh_user: administrator
+ansible_ssh_port: 5986
+ansible_connection: winrm
+ansible_winrm_server_cert_validation: ignore
+
+git_prep_projects:
+  - openstack/requirements
+  - openstack/cinder
+  - openstack/os-win
+
+services:
+  - cinder:
+    name: cinder-volume
+    description: OpenStack Cinder Volume Service
+    binary: "{{ win_dir.python }}\\scripts\\cinder-volume.exe"
+    config: "{{ win_dir.etc }}\\cinder.conf"
+    template: cinder.conf
+
+#cherry_picks:
+#  - project: openstack/cinder
+#    path: "{{ win_dir.build }}\\cinder"
+#    patches:
+#      - refs/changes/41/403641/4
+#      - refs/changes/19/426719/4
+#  - project: openstack/os-win
+#    path: "{{ win_dir.build }}\\os-win"
+#    patches:
+#      - refs/changes/41/403641/4
+#      - refs/changes/19/426719/4
+

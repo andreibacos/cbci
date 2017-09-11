@@ -1,0 +1,24 @@
+    - name: Check if cinder-volume service is up
+      shell: |
+        source /home/ubuntu/keystonerc
+        CINDER_COUNT=$(openstack volume service list | grep cinder-volume | grep -c -w up)
+        if [ $CINDER_COUNT -ne 1 ];then
+            openstack volume service list
+            exit 1
+        fi
+        openstack volume service list
+      args:
+        executable: /bin/bash
+      register: cinder_service_check
+      until: cinder_service_check.rc == 0
+      retries: "{{ service_check_retries }}"
+      delay: "{{ service_check_delay }}"
+      ignore_errors: yes
+
+    - name: Show cinder services output
+      debug: var=cinder_service_check.stdout_lines
+
+    - name: Fail when cinder-volume is down
+      fail:
+        msg: "cinder-volume is down"
+      when: cinder_service_check.rc != 0

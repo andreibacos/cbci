@@ -4,3 +4,8 @@
     msg: "join_ad is True but there are no hosts in 'ad' group, either add atleast one active directory server or set join_ad to False"
   when: join_ad is defined and join_ad and ((groups['ad'] is not defined) or (groups['ad'] | length) == 0)
 
+- name: Check if job_type parameters is defined
+  fail:
+    msg: "job_type parameters is not defined and is needed for project {{ zuul_project }}"
+  when: job_type is not defined and (zuul_project in ["openstack/cinder", "openstack/manila"])
+

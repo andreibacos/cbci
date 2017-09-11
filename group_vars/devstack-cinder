@@ -34,7 +34,6 @@ local_conf:
     - g-reg
     - cinder
     - c-api
-    - c-vol
     - c-sch
     - c-bak
     - s-proxy
@@ -54,6 +53,7 @@ local_conf:
     - tempest
 
   disable_services:
+    - c-vol
     - n-obj
     - n-novnc
     - n-net
@@ -63,11 +63,12 @@ local_conf:
     - horizon
 
   ip_version: 4
-  live_migration: False
-  block_migration: False
+  live_migration: True
+  block_migration: True
   tenant_vlan_range: "500:1000"
   image_urls: http://144.76.59.195:8088/cirros-0.3.3-x86_64.vhdx
   append: |
+    ATTACH_ENCRYPTED_VOLUME_AVAILABLE=False
     SWIFT_REPLICAS=1
     SWIFT_HASH=66a3d6b56c1f479c8b4e70ab5d2014f6
     SWIFT_START_ALL_SERVICES=False
@@ -112,17 +113,9 @@ local_conf:
     quota_firewall_rule = 100
     
     [[post-config|$CINDER_CONF]]
-    [lvmdriver-1]
-    lvm_max_over_subscription_ratio = 40.0
-    image_volume_cache_enabled = False
-    lvm_type = default
     [DEFAULT]
-    quota_volumes = 10
-    quota_snapshots = 10
-    quota_gigabytes = 1000
-    quota_backups = 10
-    quota_backup_gigabytes = 1000
-    
+    os_privileged_user_auth_url=http://{{ devstack_ip }}/identity/v2.0
+ 
     [[post-config|/$Q_PLUGIN_CONF_FILE]]
     [securitygroup]
     enable_security_group = True
@@ -132,3 +125,34 @@ local_conf:
     [ovs]
     of_interface = ovs-ofctl
 
+localsh_append: |
+    # Workaround for the missing volume type id. TODO: remove this after it's fixed.
+    # This is also used for the wrong extra_specs format issue
+    cinder type-create blank
+
+post_stack_bash: |
+    source {{ devstack_dir.devstack }}/functions
+    TEMPEST_CONFIG={{ devstack_dir.stack }}/tempest/etc/tempest.conf
+    iniset $TEMPEST_CONFIG compute volume_device_name "sdb"
+    iniset $TEMPEST_CONFIG compute min_compute_nodes {{ hv2016_compute_nodes | length }}
+    iniset $TEMPEST_CONFIG compute-feature-enabled rdp_console true
+    iniset $TEMPEST_CONFIG compute-feature-enabled block_migrate_cinder_iscsi False
+    iniset $TEMPEST_CONFIG compute-feature-enabled block_migration_for_live_migration False
+    iniset $TEMPEST_CONFIG compute-feature-enabled live_migration True
+    iniset $TEMPEST_CONFIG compute-feature-enabled interface_attach False
+
+    iniset $TEMPEST_CONFIG scenario img_dir "/home/ubuntu/devstack/files/"
+    iniset $TEMPEST_CONFIG scenario img_file "{{ local_conf.image_urls | basename }}"
+    iniset $TEMPEST_CONFIG scenario img_disk_format vhdx
+
+    IMAGE_REF=`iniget $TEMPEST_CONFIG compute image_ref`
+    iniset $TEMPEST_CONFIG compute image_ref_alt $IMAGE_REF
+
+    iniset $TEMPEST_CONFIG compute build_timeout 360
+    iniset $TEMPEST_CONFIG orchestration build_timeout 360
+    iniset $TEMPEST_CONFIG volume build_timeout 360
+    iniset $TEMPEST_CONFIG boto build_timeout 360
+
+    iniset $TEMPEST_CONFIG compute ssh_timeout 360
+    iniset $TEMPEST_CONFIG compute allow_tenant_isolation True
+    iniset $TEMPEST_CONFIG volume-feature-enabled manage_volume False

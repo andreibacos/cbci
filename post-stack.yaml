@@ -1,4 +1,45 @@
 ---
+- hosts: win2016-cinder
+  vars_files:
+    - zuul-params.yaml
+    - group_vars/windows
+
+  tasks:
+    - name: Include additional variables based on job_type
+      include_vars: "group_vars/win2016-cinder-{{ job_type }}" 
+      when: job_type is defined
+      tags: always
+
+    - include: tasks/windows/join-ad.yaml
+      when: join_ad is defined and join_ad
+
+    - include: tasks/windows/configure-smbshare.yaml
+      when: smbshare is defined and job_type == "smb3-windows"
+
+    - name: Configure services with AD user
+      set_fact:
+        service_username: "administrator@{{ ad_domain }}"
+      when: join_ad is defined and join_ad
+
+    - name: Configure services with local user
+      set_fact:
+        service_username: "administrator"
+      when: join_ad is not defined or not join_ad
+
+    - name: Start services
+      win_service:
+        name: "{{ item.name }}"
+        display_name: "{{ item.name }}"
+        description: "{{ item.description }}"
+        username: "{{ service_username }}"
+        password: "{{ ansible_ssh_pass }}"
+        state: restarted
+        start_mode: auto
+        path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
+      with_items: "{{ services }}"
+      tags: start-services
+
+
 - hosts: hv2016-compute
   vars_files:
     - zuul-params.yaml
@@ -43,8 +84,16 @@
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
       tags: always 
 
+    - name: Include job_type specific variables
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
+      tags: always
+
     - include: tasks/devstack/check-devstack-nova-services.yaml
     - include: tasks/devstack/check-devstack-neutron-services.yaml
+    - include: tasks/devstack/check-devstack-cinder-services.yaml
+      when: zuul_project == "openstack/cinder"
+
     - include: tasks/devstack/discover-hosts.yaml
 
     - name: Restart nova api
@@ -89,6 +138,7 @@
         > {{ devstack_dir.home }}/tempest/run-tests.sh.log
       failed_when: False
       register: tempest_result
+      when: run_tests is not defined or run_tests
       tags: run-tests
 
     - debug: var=tempest_result

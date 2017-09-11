@@ -5,3 +5,5 @@
   zuul_patchset: 5
   zuul_branch: master
   zuul_head_only: True
+  #job_type: smb3-windows
+  run_tests: True

@@ -9,7 +9,7 @@
     win_get_url:
       url: "{{ win_utils_bin_archive_url }}"
       dest: "{{ win_dir.tmp }}\\utils.zip"
-    when: utils_zip.stat.exists == False                
+    when: utils_zip.stat.exists == False
     tags: install-utils
 
   - name: Unzip utils archive

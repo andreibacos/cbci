@@ -7,7 +7,15 @@
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
       tags: always
- 
+
+    - name: Include job_type specific variables
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
+      tags: always
+
+    - include: tasks/devstack/configure-hostname.yaml
+      when: hostname is defined
+
     - include: tasks/devstack/configure-sudoers.yaml
 
     - include: tasks/devstack/run-unstack.yaml

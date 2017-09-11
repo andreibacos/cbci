@@ -1,0 +1,15 @@
+- name: Add /etc/hosts entry for {{ hostname }}
+  lineinfile:
+    path: /etc/hosts
+    line: '127.0.0.1 {{ hostname }}'
+  become: True
+  tags: set-hostname
+
+- name: Change hostname to {{ hostname }}
+  shell: |
+    echo "{{hostname}}" > /etc/hostname
+    hostname "{{hostname}}"
+  become: True
+  tags: set-hostname
+
+

@@ -1,18 +1,16 @@
 ---
-- hosts: hv2016-compute
-  any_errors_fatal: true
+- hosts: win2016-cinder
   vars_files: 
     - zuul-params.yaml
     - group_vars/windows
 
   tasks:
-    - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
-      include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
-      failed_when: False
-      tags: always
-
     # Run sanity checks as early as possible
     - include: tasks/windows/sanity-checks.yaml
+
+    - name: Include additional variables based on job_type
+      include_vars: "group_vars/win2016-cinder-{{ job_type }}"
+      tags: always
 
     - name: Configure hostname
       win_shell: (Rename-Computer -NewName "{{ hostname }}" -passthru).hassucceeded
@@ -38,16 +36,6 @@
       with_items: "{{ services }}"
       tags: create-services
    
-    - name: Create vmswitches
-      cb_vmswitch:
-        name: "{{ item.name }}"
-        management: "{{ item.management }}"
-        subnet: "{{ item.subnet }}"
-        state: present
-      with_items: "{{ vmswitches }}"
-      when: vmswitches is defined
-      tags: create-vmswitch
-
     - include: tasks/windows/create-folders.yaml
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml
@@ -55,12 +43,14 @@
     - include: tasks/windows/configure-pip-index.yaml
     - include: tasks/windows/install-git.yaml
     - include: tasks/windows/install-vcredist.yaml
-    - include: tasks/windows/install-freerdp.yaml
     - include: tasks/windows/install-zuul.yaml
     - include: tasks/windows/prepare-git-repos.yaml
     
     - name: Update setuptools
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
+
+    - name: Install pymysql
+      win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U pymysql"
     
     - include: tasks/windows/install-project.yaml
       with_items: "{{ git_prep_projects }}"
@@ -71,11 +61,15 @@
         src: "windows/{{ item }}"
         dest: "{{ win_dir.etc }}\\{{ item }}"
       with_items:
-        - nova.conf
-        - neutron-hyperv-agent.conf
-        - policy.json
+        - cinder.conf
       tags: create-configs
-     
+
+    - name: Install FS-iSCSITarget-Server
+      win_feature:
+        name: FS-iSCSITarget-Server
+        state: present
+      when: job_type == "iscsi"
+
     - name: Start iscsi service
       win_service:
         name: msiscsi

@@ -1,9 +1,12 @@
 [ad]
-192.168.171.132 hostname=ad
+192.168.171.197 hostname=ad
+
+[win2016-cinder]
+#192.168.171.167 hostname=cinder
 
 [hv2016-compute]
 192.168.171.136 hostname=compute2
 192.168.171.133 hostname=compute1
 
 [devstack]
-192.168.171.134
+192.168.171.134 hostname=devstack ansible_ssh_common_args='-o StrictHostKeyChecking=no'

@@ -1,0 +1,30 @@
+    - name: Create share folder
+      win_file:
+        path: "{{ smbshare }}"
+        state: directory
+      tags: smbshare
+
+    - name: Add SMB Share
+      win_share:
+        name: smbshare
+        path: "{{ smbshare }}"
+        full: Administrator
+      tags: smbshare
+
+    - name: Grant full share access for domain administrator
+      win_shell: "Grant-SmbShareAccess -Name smbshare -AccountName administrator@{{ ad_domain }} -AccessRight Full -Force"
+      tags: smbshare
+
+    - name: Grant full share access for compute machine accounts
+      win_shell: "Grant-SmbShareAccess -Name smbshare -AccountName {{ ad_domain }}\\{{ hostvars[item]['hostname'] }}$ -AccessRight Full -Force"
+      tags: smbshare
+      when: join_ad is defined and join_ad
+      with_items: "{{ groups['hv2016-compute'] }}"
+
+    - name: Write 'C:\openstack\smbfs_shares.conf'
+      win_lineinfile:
+        create: yes
+        path: 'C:\openstack\smbfs_shares.conf'
+        line: "//127.0.0.1/smbshare -o username=Administrator,password={{ ansible_ssh_pass }}"
+      tags: smbshare
+

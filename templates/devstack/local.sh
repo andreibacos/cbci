@@ -26,3 +26,6 @@ echo "Neutron subnetworks:"
 neutron subnet-list
 for subnet in `neutron subnet-list | grep start | awk {'print $2'}`; do neutron subnet-show $subnet; done
 
+{% if localsh_append is defined %}
+{{ localsh_append }}
+{% endif %}
