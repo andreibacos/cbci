@@ -9,3 +9,8 @@
     msg: "job_type parameters is not defined and is needed for project {{ zuul_project }}"
   when: job_type is not defined and (zuul_project in ["openstack/cinder", "openstack/manila"])
 
+- name: Check if hostname parameter is defined
+  fail:
+    msg: "hostname variable not defined"
+  when: hostname is not defined
+

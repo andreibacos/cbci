@@ -3,6 +3,7 @@
       repo: "{{ devstack_repo }}"
       dest: "{{ devstack_dir.devstack }}"
       version: "{{ zuul_branch }}"
+      force: yes
     tags: prepare-git-repos
 
   - name: Upload zuul clonemap file

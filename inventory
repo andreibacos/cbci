@@ -1,5 +1,5 @@
 [ad]
-192.168.171.197 hostname=ad
+192.168.171.210 hostname=ad
 
 [win2016-cinder]
 #192.168.171.167 hostname=cinder

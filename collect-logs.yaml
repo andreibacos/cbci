@@ -1,0 +1,96 @@
+- hosts: hv2016-compute,win2016-cinder
+
+  vars_files: 
+    - zuul-params.yaml
+    - group_vars/windows
+
+  tasks:
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
+      tags: always 
+
+    - name: Include job_type specific variables
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
+      tags: always
+
+    - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
+      include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Get log files
+      shell: |
+        if [ ! -d "{{ item.value.dest }}" ];then
+            mkdir -p "{{ item.value.dest }}"
+        fi
+        smbclient "//{{ inventory_hostname }}/C\$" -c "prompt OFF; cd {{ item.value.src }}" -U "administrator%Passw0rd"
+        if [ $? -ne 0 ];then
+            echo "Folder {{ item.value.src }} does not exists"
+        else
+            smbclient "//{{ inventory_hostname }}/C\$" -c "prompt OFF; recurse ON; lcd {{ item.value.dest }}; cd {{ item.value.src }}; mget *" -U "administrator%Passw0rd"
+        fi
+      args:
+        executable: /bin/bash
+      with_dict:
+        log:
+          dest: "{{ log_path }}/windows/logs/{{ hostname }}"
+          src: '\openstack\log'
+      delegate_to: 127.0.0.1
+
+    - name: Get config files
+      shell: |
+        if [ ! -d "{{ item.value.dest }}" ];then
+            mkdir -p "{{ item.value.dest }}"
+        fi
+        smbclient "//{{ inventory_hostname }}/C\$" -c "prompt OFF; cd {{ item.value.src }}" -U "administrator%Passw0rd"
+        if [ $? -ne 0 ];then
+            echo "Folder {{ item.value.src }} does not exists"
+        else
+            smbclient "//{{ inventory_hostname }}/C\$" -c "prompt OFF; recurse ON; lcd {{ item.value.dest }}; cd {{ item.value.src }}; mget *" -U "administrator%Passw0rd"
+        fi
+      args:
+        executable: /bin/bash
+      with_dict:
+        log:
+          dest: "{{ log_path }}/windows/confs/{{ hostname }}"
+          src: '\openstack\etc'
+      delegate_to: 127.0.0.1
+
+
+
+- hosts: devstack
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
+      tags: always 
+
+    - name: Include job_type specific variables
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
+      tags: always
+
+    - name: Export logs to {{ devstack_dir.stack }}/logs using journalctl
+      shell: |
+        for u in $(sudo systemctl list-unit-files | grep devstack | awk '{print $1}'); do
+            name=$(echo $u | sed 's/devstack@//' | sed 's/\.service//')
+            sudo journalctl -o short-precise --unit $u > {{ devstack_dir.stack }}/logs/$name.txt
+        done
+
+    - name: Create devstack log folder
+      file:
+        path: "{{ log_path }}/devstack/logs"
+        state: directory
+        mode: 0755
+      delegate_to: 127.0.0.1
+
+    - name: Copy log files
+      synchronize:
+        mode: pull
+        src: /opt/stack/logs/
+        dest: "{{ log_path }}/devstack/logs"
+        rsync_opts:
+          - "--no-links"

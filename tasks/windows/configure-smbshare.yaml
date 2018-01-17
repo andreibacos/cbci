@@ -21,10 +21,10 @@
       when: join_ad is defined and join_ad
       with_items: "{{ groups['hv2016-compute'] }}"
 
-    - name: Write 'C:\openstack\smbfs_shares.conf'
+    - name: Write 'C:\openstack\etc\smbfs_shares.conf'
       win_lineinfile:
         create: yes
-        path: 'C:\openstack\smbfs_shares.conf'
+        path: 'C:\openstack\etc\smbfs_shares.conf'
         line: "//127.0.0.1/smbshare -o username=Administrator,password={{ ansible_ssh_pass }}"
       tags: smbshare
 

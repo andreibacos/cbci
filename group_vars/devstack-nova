@@ -1,16 +1,14 @@
-#cherry_picks:
-#  - project: openstack/cinder
-#    path: "{{ devstack_dir.stack }}/cinder"
-#    patches:
-#      - refs/changes/41/403641/4
-#      - refs/changes/19/426719/4
-#  - project: openstack/os-win
-#    path: "{{ devstack_dir.stack }}/os-win"
-#    patches:
-#      - refs/changes/41/403641/4
-#      - refs/changes/19/426719/4
-
-
+cherry_picks:
+  - project: openstack/tempest
+    path: "{{ devstack_dir.stack }}/tempest"
+    patches:
+      - refs/changes/49/383049/13
+      - refs/changes/28/384528/10
+      - refs/changes/13/433213/3
+  - project: openstack-dev/devstack
+    path: "{{ devstack_dir.devstack }}"
+    patches:
+      - refs/changes/25/473525/3
 
 tempest_tests:
   included-tests: |

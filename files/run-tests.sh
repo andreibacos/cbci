@@ -81,22 +81,22 @@ testr last --subunit > $TEMPEST_LOGS_FOLDER/subunit.output
 
 if [ "$ISOLATED_TESTS_REGEX" != "^no_isolated" ];then
     echo "$ALL_TESTS" | grep -E "$ISOLATED_TESTS_REGEX" | sed -e 's/\[[^][]*\]//g' > $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
-    tox -eall-plugin -- ".*" --serial --combine --whitelist-file $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
+    tox -eall-plugin -- ".*" --serial --whitelist-file $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
     testr last --subunit >> $TEMPEST_LOGS_FOLDER/subunit.output
 fi
 
-subunit-stats $TEMPEST_LOGS_FOLDER/subunit.output > /dev/null
-test_result=$?
+#subunit-stats $TEMPEST_LOGS_FOLDER/subunit.output > /dev/null
+#test_result=$?
 # retry failed tests as isolated
-if [ $test_result -ne 0 ];then
-    echo "The following tests failed, retrying them isolated"
-    cat $TEMPEST_LOGS_FOLDER/subunit.output | subunit-filter --failure --no-skip | subunit-ls | sed -e 's/\[[^][]*\]//g' | tee $TEMPEST_LOGS_FOLDER/retry-testlist.txt
+#if [ $test_result -ne 0 ];then
+#    echo "The following tests failed, retrying them isolated"
+#    cat $TEMPEST_LOGS_FOLDER/subunit.output | subunit-filter --failure --no-skip | subunit-ls | sed -e 's/\[[^][]*\]//g' | tee $TEMPEST_LOGS_FOLDER/retry-testlist.txt
     # remove failed tests from subunit.output because we add them again after retry
-    cat $TEMPEST_LOGS_FOLDER/subunit.output | subunit-filter -efs > $TEMPEST_LOGS_FOLDER/subunit.tmp
-    mv $TEMPEST_LOGS_FOLDER/subunit.tmp $TEMPEST_LOGS_FOLDER/subunit.output
-    tox -eall-plugin -- ".*" --serial --combine --whitelist-file $TEMPEST_LOGS_FOLDER/retry-testlist.txt
-    testr last --subunit >> $TEMPEST_LOGS_FOLDER/subunit.output
-fi
+#    cat $TEMPEST_LOGS_FOLDER/subunit.output | subunit-filter -efs > $TEMPEST_LOGS_FOLDER/subunit.tmp
+#    mv $TEMPEST_LOGS_FOLDER/subunit.tmp $TEMPEST_LOGS_FOLDER/subunit.output
+#    tox -eall-plugin -- ".*" --serial --combine --whitelist-file $TEMPEST_LOGS_FOLDER/retry-testlist.txt
+#    testr last --subunit >> $TEMPEST_LOGS_FOLDER/subunit.output
+#fi
 
 subunit2html $TEMPEST_LOGS_FOLDER/subunit.output $TEMPEST_LOGS_FOLDER/subunit.html
 subunit-stats $TEMPEST_LOGS_FOLDER/subunit.output > $TEMPEST_LOGS_FOLDER/subunit.stats

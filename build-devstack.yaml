@@ -30,6 +30,16 @@
 
     - include: tasks/devstack/install-zuul.yaml
     - include: tasks/devstack/prepare-git-repos.yaml
+
+    - name: Applying cherry-picks
+      cb_cherry_pick_devstack:
+        url: "{{ git_server }}/{{ item.project }}"
+        ref: "{{ item.patches }}"
+        path: "{{ item.path }}"
+      with_items: "{{ cherry_picks }}"
+      when: cherry_picks is defined
+      tags: cherry-pick
+
     - include: tasks/devstack/install-networking-hyperv.yaml
 
     - include: tasks/devstack/write-configs.yaml
