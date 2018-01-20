@@ -19,7 +19,7 @@
       win_shell: "Grant-SmbShareAccess -Name smbshare -AccountName {{ ad_domain }}\\{{ hostvars[item]['hostname'] }}$ -AccessRight Full -Force"
       tags: smbshare
       when: join_ad is defined and join_ad
-      with_items: "{{ groups['hv2016-compute'] }}"
+      with_items: "{{ groups['win2016-compute'] }}"
 
     - name: Write 'C:\openstack\etc\smbfs_shares.conf'
       win_lineinfile:

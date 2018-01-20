@@ -1,15 +1,15 @@
   - name: Create OVS bridge "{{ data_bridge }}"
     openvswitch_bridge:
       bridge: "{{ data_bridge  }}"
-    when: ifs.data.name != data_bridge
+    when: data_interface is defined
     become: True
     tags: configure-ovs
 
-  - name: Add interface "{{ ifs.data.name }}" to OVS bridge "{{ data_bridge }}"
+  - name: Add interface "{{ data_interface }}" to OVS bridge "{{ data_bridge }}"
     openvswitch_port:
-      bridge: "{{ data_bridge  }}"
-      port: "{{ ifs.data.name }}"
-    when: ifs.data.name != data_bridge
+      bridge: "{{ data_bridge }}"
+      port: "{{ data_interface }}"
+    when: data_interface is defined
     become: True
     tags: configure-ovs
 

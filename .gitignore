@@ -1,2 +1,4 @@
 *.log
 *.retry
+inventory
+inv

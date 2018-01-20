@@ -16,7 +16,7 @@ tasks_example = {
         {"cmd": "ansible-playbook -i inventory build-devstack.yaml",
          "log": "dvsm.log"},
     "Build compute":
-        {"cmd": "ansible-playbook -i inventory build-hv2016-compute.yaml",
+        {"cmd": "ansible-playbook -i inventory build-win2016-compute.yaml",
          "log": "hv.log"}
 }
 

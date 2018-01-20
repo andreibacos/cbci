@@ -1,0 +1,41 @@
+- hosts: 127.0.0.1
+  connection: local
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+    - name: Creating instances
+      os_server:
+        state: present
+        name: "{{ item.name }}"
+        image: "{{ item.image }}"
+        key_name: default
+        timeout: 300
+        userdata: "{{ item.userdata }}"
+        flavor: "{{ item.flavor }}"
+        config_drive: yes
+        nics:
+          - net-id: "{{ item.network_id }}"
+          - net-id: "{{ item.network_id }}"
+      register: test_out
+      with_items: "{{ vms }}"
+
+    - set_fact:
+        build_hosts: "{{ build_hosts|default([]) + [ {'name': item.item.name, 
+                                                      'ip': item.server.interface_ip, 
+                                                      'group': item.item.inventory_group, 
+                                                      'additional_params': item.item.additional_params} ] }}"
+      with_items: "{{ test_out.results }}"
+
+    - name: Print build_hosts
+      debug: var=build_hosts
+
+    - name: Generate inventory file
+      blockinfile:
+        path: "{{ inv_file }}"
+        create: yes
+        block: |
+          [{{ item.group }}]
+          {{ item.ip }} hostname={{ item.name }} {{ item.additional_params }}
+        marker: "# {mark} {{ item.name }}"
+      with_items: "{{ build_hosts }}"

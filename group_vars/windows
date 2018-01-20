@@ -2,6 +2,12 @@
 # windows specific variables
 ########################################################################################################################################
 
+ansible_winrm_transport: certificate
+ansible_ssh_user: administrator
+ansible_ssh_port: 5986
+ansible_connection: winrm
+ansible_winrm_server_cert_validation: ignore
+
 win_dir:
   openstack: 'c:\openstack'
   bin: 'c:\openstack\bin'

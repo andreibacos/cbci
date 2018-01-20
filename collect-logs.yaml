@@ -1,4 +1,4 @@
-- hosts: hv2016-compute,win2016-cinder
+- hosts: win2016-compute,win2016-cinder
 
   vars_files: 
     - zuul-params.yaml
@@ -14,8 +14,8 @@
       when: job_type is defined
       tags: always
 
-    - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
-      include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
+    - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}
+      include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}"
       failed_when: False
       tags: always
 

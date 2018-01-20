@@ -7,7 +7,7 @@
     tags: prepare-git-repos
 
   - name: Upload zuul clonemap file
-    win_copy:
+    copy:
       dest: "{{ devstack_dir.home }}/clonemap.yaml"
       src: files/zuul-clonemap.yaml
     tags: prepare-git-repos

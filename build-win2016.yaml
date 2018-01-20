@@ -1,31 +1,5 @@
 ---
-- hosts: hv2016-compute
-  any_errors_fatal: true
-  vars_files: 
-    - zuul-params.yaml
-    - group_vars/windows
-
-  tasks:
-    - name: Include variables from group_vars/hv2016-compute-{{ zuul_project | basename }}
-      include_vars: "group_vars/hv2016-compute-{{ zuul_project | basename }}"
-      failed_when: False
-      tags: always
-
-    # Run sanity checks as early as possible
-    - include: tasks/windows/sanity-checks.yaml
-
-    - name: Configure hostname
-      win_shell: (Rename-Computer -NewName "{{ hostname }}" -passthru).hassucceeded
-      when: hostname is defined and ansible_hostname != hostname|upper
-      register: change_hostname
-      failed_when: False
-      tags: set-hostname
-
-    - name: Reboot after hostname change if necessary
-      win_reboot:
-      when: (change_hostname.skipped is defined and not change_hostname.skipped) or
-            (change_hostname.changed is defined and change_hostname.changed)
-      tags: set-hostname
+    - include: tasks/windows/create-folders.yaml
 
     - name: Create services and/or stop them if they are running
       win_service:
@@ -37,7 +11,20 @@
         path: "{{ win_dir.bin }}\\OpenStackService.exe {{ item.name }} {{ item.binary }} --config-file {{ item.config }}"
       with_items: "{{ services }}"
       tags: create-services
-   
+
+    - name: Create config files
+      win_template:
+        src: "windows/{{ item.template }}"
+        dest: "{{ item.config}}"
+      with_items: "{{ services }}"
+      tags: create-configs
+  
+    - name: Create policy.json
+      win_template:
+        src: "windows/policy.json"
+        dest: "{{ win_dir.etc }}\\policy.json"
+      tags: create-configs
+ 
     - name: Create vmswitches
       cb_vmswitch:
         name: "{{ item.name }}"
@@ -48,7 +35,6 @@
       when: vmswitches is defined
       tags: create-vmswitch
 
-    - include: tasks/windows/create-folders.yaml
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml
     - include: tasks/windows/install-pip.yaml
@@ -65,16 +51,6 @@
     - include: tasks/windows/install-project.yaml
       with_items: "{{ git_prep_projects }}"
       tags:  install-project
-    
-    - name: Create config files
-      win_template:
-        src: "windows/{{ item }}"
-        dest: "{{ win_dir.etc }}\\{{ item }}"
-      with_items:
-        - nova.conf
-        - neutron-hyperv-agent.conf
-        - policy.json
-      tags: create-configs
      
     - name: Start iscsi service
       win_service:

@@ -1,0 +1,41 @@
+
+git_prep_projects:
+  - openstack/requirements
+  - openstack/nova
+  - openstack/neutron
+  - openstack/networking-hyperv
+  - openstack/os-win
+
+services:
+  - nova:
+    name: nova-compute
+    description: OpenStack nova Compute Service
+    binary: "{{ win_dir.python }}\\scripts\\nova-compute.exe"
+    config: "{{ win_dir.etc }}\\nova.conf"
+    template: nova.conf
+
+  - neutron:
+    name: neutron-hyperv-agent
+    description: OpenStack Neutron Hyper-V Agent Service
+    binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
+    config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
+    template: neutron-hyperv-agent.conf
+
+#cherry_picks:
+#  - project: openstack/cinder
+#    path: "{{ win_dir.build }}\\cinder"
+#    patches:
+#      - refs/changes/41/403641/4
+#      - refs/changes/19/426719/4
+#  - project: openstack/os-win
+#    path: "{{ win_dir.build }}\\os-win"
+#    patches:
+#      - refs/changes/41/403641/4
+#      - refs/changes/19/426719/4
+
+compute_driver: hyperv.driver.HyperVDriver
+
+vmswitches:
+  - name: "{{ data_bridge }}"
+    subnet: "{{ data_network }}"
+    management: True

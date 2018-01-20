@@ -1,10 +1,5 @@
 zuul_head_only: True
 
-ansible_ssh_user: administrator
-ansible_ssh_port: 5986
-ansible_connection: winrm
-ansible_winrm_server_cert_validation: ignore
-
 git_prep_projects:
   - openstack/requirements
   - openstack/nova

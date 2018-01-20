@@ -2,11 +2,12 @@
     cb_find_data_interface:
       subnet: "{{ data_network }}"
     register: ifs
+    when: data_interface is not defined
     tags: write-configs, configure-ovs
 
   - name: Set data_interface variable to "{{ ifs.data.name }}"
     set_fact:
       data_interface: "{{ ifs.data.name }} "
-    when: ifs.data.name != data_bridge
+    when: data_interface is not defined and ifs.data.name != data_bridge
     tags: write-configs, configure-ovs
 

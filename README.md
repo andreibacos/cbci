@@ -64,7 +64,7 @@ ansible -i inventory ad -m win_ping
 ## Running ansible examples
 ```
 ansible-playbook -i inventory build-devstack.yaml
-ansible-playbook -i inventory build-hv2016-compute.yaml
+ansible-playbook -i inventory build-win2016-compute.yaml
 ansible-playbook -i inventory build-ad.yaml
 ```
 
@@ -72,7 +72,7 @@ or
 
 Using the parallel_task_runner.py (takes care of killing all other unfinished tasks if one fails)
 ```
-python3 parallel_task_runner.py --tasks '{"Build devstack": {"cmd": "ansible-playbook -i inventory build-devstack.yaml", "log": "dvsm.log"}, "Build compute": {"cmd": "ansible-playbook -i inventory build-hv2016-compute.yaml", "log": "hv.log"}, "Build ad": {"cmd": "ansible-playbook -i inventory build-ad.yaml", "log": "ad.log"}}'
+python3 parallel_task_runner.py --tasks '{"Build devstack": {"cmd": "ansible-playbook -i inventory build-devstack.yaml", "log": "dvsm.log"}, "Build compute": {"cmd": "ansible-playbook -i inventory build-win2016-compute.yaml", "log": "hv.log"}, "Build ad": {"cmd": "ansible-playbook -i inventory build-ad.yaml", "log": "ad.log"}}'
 ```
 
 ## Running the tests

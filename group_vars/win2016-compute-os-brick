@@ -1,7 +1,4 @@
-ansible_ssh_user: administrator
-ansible_ssh_port: 5986
-ansible_connection: winrm
-ansible_winrm_server_cert_validation: ignore
+join_ad: False
 
 git_prep_projects:
   - openstack/requirements
@@ -9,6 +6,7 @@ git_prep_projects:
   - openstack/neutron
   - openstack/networking-hyperv
   - openstack/os-win
+  - openstack/os-brick
 
 services:
   - nova:
@@ -43,3 +41,4 @@ vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
     management: True
+
