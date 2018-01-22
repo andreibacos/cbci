@@ -1,0 +1,16 @@
+- name: Get compute IP for VM
+  shell: "openstack hypervisor show {{ hostvars[item].compute_host }} -c host_ip -f value"
+  register: compute_ip
+
+- name: Set port trunk
+  shell: "/usr/local/bin/wsmancmd -s -H {{ compute_ip.stdout }} -a certificate -c {{ win_crt }} -k {{ win_key }}
+          'powershell (get-vm -name {{ hostvars[item].compute_instance_name }} ^| set-vmnetworkadaptervlan -Trunk -AllowedVlanIdList 1-4094 -NativeVlanId 0'"
+  args:
+    executable: /bin/bash
+
+- name: Enable MAC spoofing
+  shell: "/usr/local/bin/wsmancmd -s -H {{ compute_ip.stdout }} -a certificate -c {{ win_crt }} -k {{ win_key }} 'powershell get-vm ^| Set-VMNetworkAdapter -MacAddressSpoofing On'"
+  args:
+    executable: /bin/bash
+
+#- debug: var=compute_ip

@@ -1,4 +1,14 @@
 ---
+- hosts: 127.0.0.1
+  connection: local
+  vars_files:
+    - zuul-params.yaml
+
+  tasks:
+    - name: Configure compute node trunk
+      include_tasks: tasks/configure-compute-trunk.yaml
+      with_items: "{{ groups['all'] }}"
+
 - hosts: win2016-cinder
   vars_files:
     - zuul-params.yaml

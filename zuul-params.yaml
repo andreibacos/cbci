@@ -8,7 +8,10 @@ zuul_head_only: True
 job_type: iscsi
 run_tests: True
 vlan_range: 50:100
+win_crt: /home/jenkins-slave/ssl/ssl_winrm.crt
+win_key: /home/jenkins-slave/ssl/ssl_winrm.key
 log_path: /tmp/build_logs/{{ zuul_change }}-{{ zuul_patchset }}
+log_key: /home/jenkins-slave/.ssh/id_rsa_log.pem
 vms:
   - devstack: 
     name: "dv-osbrick-321654-5"
@@ -24,6 +27,6 @@ vms:
     flavor: win2016hv
     network_id: c61730c9-ef81-497a-8a97-d08566af833f
     inventory_group: win2016-compute
-    additional_params: "ansible_winrm_cert_pem=/home/jenkins-slave/ssl/ssl_winrm.crt ansible_winrm_cert_key_pem=/home/jenkins-slave/ssl/ssl_winrm.key"
+    additional_params: "ansible_winrm_cert_pem=/home/jenkins-slave/ssl/ssl_winrm.crt ansible_winrm_cert_key_pem=/home/jenkins-slave/ssl/ssl_winrm.key ansible_winrm_transport=certificate ansible_ssh_user=administrator ansible_connection=winrm ansible_winrm_server_cert_validation=ignore ansible_ssh_port=5986"
     userdata: "{{ lookup('file', '/home/jenkins-slave/ssl/ssl_winrm.crt') }}"
-inv_file: /home/jenkins-slave/workspace/os-brick-iscsi/12341234/cbci/inv
+inv_file: /home/jenkins-slave/workspace/os-brick-iscsi-test/12341234/cbci/inv

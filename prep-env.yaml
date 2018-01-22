@@ -17,15 +17,17 @@
         nics:
           - net-id: "{{ item.network_id }}"
           - net-id: "{{ item.network_id }}"
-      register: test_out
+      register: vm_create_out
       with_items: "{{ vms }}"
 
     - set_fact:
         build_hosts: "{{ build_hosts|default([]) + [ {'name': item.item.name, 
                                                       'ip': item.server.interface_ip, 
                                                       'group': item.item.inventory_group, 
-                                                      'additional_params': item.item.additional_params} ] }}"
-      with_items: "{{ test_out.results }}"
+                                                      'additional_params': item.item.additional_params,
+                                                      'compute_host': item.server['OS-EXT-SRV-ATTR:host'],
+                                                      'compute_instance_name': item.server['OS-EXT-SRV-ATTR:instance_name']} ] }}"
+      with_items: "{{ vm_create_out.results }}"
 
     - name: Print build_hosts
       debug: var=build_hosts
@@ -36,6 +38,7 @@
         create: yes
         block: |
           [{{ item.group }}]
-          {{ item.ip }} hostname={{ item.name }} {{ item.additional_params }}
+          {{ item.ip }} hostname={{ item.name }} {{ item.additional_params }} compute_host={{ item.compute_host }} compute_instance_name={{ item.compute_instance_name }}
         marker: "# {mark} {{ item.name }}"
       with_items: "{{ build_hosts }}"
+

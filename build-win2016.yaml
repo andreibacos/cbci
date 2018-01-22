@@ -25,15 +25,19 @@
         dest: "{{ win_dir.etc }}\\policy.json"
       tags: create-configs
  
-    - name: Create vmswitches
-      cb_vmswitch:
-        name: "{{ item.name }}"
-        management: "{{ item.management }}"
-        subnet: "{{ item.subnet }}"
-        state: present
-      with_items: "{{ vmswitches }}"
-      when: vmswitches is defined
-      tags: create-vmswitch
+#    - name: Create vmswitches
+#      cb_vmswitch:
+#        name: "{{ item.name }}"
+#        management: "{{ item.management }}"
+#        subnet: "{{ item.subnet }}"
+#        state: present
+#      with_items: "{{ vmswitches }}"
+#      when: vmswitches is defined
+#      tags: create-vmswitch
+
+    - name: Create VMSwitch on second interface
+      win_shell: "New-VMSwitch -name br-data -NetAdapterName $((Get-NetAdapter -Physical)[1].name) -ErrorAction SilentlyContinue"
+      failed_when: False
 
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml

@@ -2,3 +2,4 @@
 *.retry
 inventory
 inv
+zuul-params.yaml

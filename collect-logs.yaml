@@ -2,20 +2,41 @@
 
   vars_files: 
     - zuul-params.yaml
-    - group_vars/windows
 
   tasks:
+    - name: Include variables from group_vars/windows
+      include_vars: "group_vars/windows"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from group_vars/devstack
+      include_vars: "group_vars/devstack"
+      failed_when: False
+      tags: always
+
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
+      failed_when: False
       tags: always 
 
-    - name: Include job_type specific variables
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
       when: job_type is defined
+      tags: always
+
+    - name: Include variables from group_vars/win2016-compute
+      include_vars: "group_vars/win2016-compute"
+      failed_when: False
       tags: always
 
     - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}
       include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}"
       failed_when: False
       tags: always
 
@@ -36,6 +57,7 @@
         log:
           dest: "{{ log_path }}/windows/logs/{{ hostname }}"
           src: '\openstack\log'
+      ignore_errors: True
       delegate_to: 127.0.0.1
 
     - name: Get config files
@@ -55,6 +77,7 @@
         log:
           dest: "{{ log_path }}/windows/confs/{{ hostname }}"
           src: '\openstack\etc'
+      ignore_errors: True
       delegate_to: 127.0.0.1
 
 
@@ -64,12 +87,19 @@
     - zuul-params.yaml
 
   tasks:
+    - name: Include variables from group_vars/devstack
+      include_vars: "group_vars/devstack"
+      failed_when: False
+      tags: always
+
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
-      tags: always 
+      failed_when: False
+      tags: always
 
-    - name: Include job_type specific variables
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
       when: job_type is defined
       tags: always
 
@@ -79,18 +109,95 @@
             name=$(echo $u | sed 's/devstack@//' | sed 's/\.service//')
             sudo journalctl -o short-precise --unit $u > {{ devstack_dir.stack }}/logs/$name.txt
         done
+      ignore_errors: True
 
-    - name: Create devstack log folder
+    - name: Create devstack folders
       file:
-        path: "{{ log_path }}/devstack/logs"
+        path: "{{ item }}"
         state: directory
         mode: 0755
+      with_items:
+        - "{{ log_path }}/devstack/logs"
+        - "{{ log_path }}/devstack/conf"
+        - "{{ log_path }}/tempest"
+      ignore_errors: True
       delegate_to: 127.0.0.1
+
+    - name: Dump pip list to file
+      shell: pip list > /opt/stack/logs/pip-list.txt
+      become: True
+      ignore_errors: True
+
+    - name: Dump OVS bridge config to file
+      shell: ovs-vsctl -v show > /opt/stack/logs/ovs-bridges.txt
+      become: True
+      ignore_errors: True
 
     - name: Copy log files
       synchronize:
         mode: pull
-        src: /opt/stack/logs/
+        src: "{{ item }}"
         dest: "{{ log_path }}/devstack/logs"
         rsync_opts:
           - "--no-links"
+      ignore_errors: True
+      with_items:
+        - /opt/stack/logs/
+        - /var/log/cloud-init-output.log
+        - /var/log/cloud-init.log
+        - /var/log/syslog
+        - /var/log/mysql/error.log
+        
+    - name: Copy conf files
+      synchronize:
+        mode: pull
+        src: "{{ item }}"
+        dest: "{{ log_path }}/devstack/conf"
+        rsync_opts:
+          - "--no-links"
+      ignore_errors: True
+      with_items:
+        - /etc/neutron
+        - /etc/nova
+        - /etc/cinder
+        - /etc/glance
+        - /etc/keystone
+        - /etc/swift
+        - /etc/openvswitch
+
+    - name: Copy tempest files
+      synchronize:
+        mode: pull
+        src: "{{ item }}"
+        dest: "{{ log_path }}/tempest"
+        rsync_opts:
+          - "--no-links"
+      ignore_errors: True
+      with_items:
+        - /opt/stack/tempest/tempest.log
+        - /opt/stack/tempest/etc/tempest.conf
+        - /home/ubuntu/tempest/
+
+
+- hosts: 127.0.0.1
+  connection: local
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+
+    - name: Archive all files in {{ log_path }}
+      shell: |
+        for file in $(find "{{ log_path }}" -type f)
+        do 
+            gzip $file
+        done
+
+    - name: Make sure log server folder is empty
+      shell: |
+        ssh cloudbase@cloudbase-ci.com -i "{{ log_key }}" "if [ -d /srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }} ];then rm -rf /srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }};fi; mkdir -p /srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }}"
+
+    - name: Upload logs
+      shell: |
+        rsync -av -e "ssh -i {{ log_key }}" "{{ log_path }}/" "cloudbase@cloudbase-ci.com:/srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }}"
+
