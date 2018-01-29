@@ -25,13 +25,4 @@ data_bridge: br-data
 
 win2016_compute_nodes: "{{ groups['win2016-compute'] }}"
 devstack_ip: "{{ groups['devstack'][0] }}"
-
-undercloud_networks:
-  - name: mgmt
-    network: dataplane
-    subnet_id: 2759aa26-d9b9-4851-8205-c361f5438133 
-  - name: data
-    network: dataplane
-    subnet_id: e3cc60cc-fb78-43d5-9601-e3fe9be37d7c
-
   
