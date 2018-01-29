@@ -1,0 +1,38 @@
+  - name: Creating neutron management port for instance {{ vm.name }}
+    os_port:
+      state: present
+      name: "{{ vm.name }}-mgmt"
+      network: dataplane
+      fixed_ips:
+        - subnet_id: 2759aa26-d9b9-4851-8205-c361f5438133
+    register: create_mgmt_port_out
+
+  - name: Creating neutron dataplane port for instance {{ vm.name }}
+    os_port:
+      state: present
+      name: "{{ vm.name }}-data"
+      network: dataplane
+      fixed_ips:
+        - subnet_id: e3cc60cc-fb78-43d5-9601-e3fe9be37d7c
+    register: create_data_port_out
+
+  - name: Creating instance {{ vm.name }}
+    os_server:
+      state: present
+      name: "{{ vm.name }}"
+      image: "{{ vm.image }}"
+      key_name: default
+      timeout: 300
+      userdata: "{{ vm.userdata }}"
+      flavor: "{{ vm.flavor }}"
+      config_drive: yes
+      nics:
+        - port-id: "{{ create_mgmt_port_out.port.id }}"
+        - port-id: "{{ create_data_port_out.port.id }}"
+    register: vm_create_out
+
+  - name: Save instance create output
+    set_fact:
+      vm_data: "{{ vm_data | default({}) | combine( {vm.name: { 'server': vm_create_out.server, 'ports': { 'management': create_mgmt_port_out, 'dataplane': create_data_port_out }}} ) }}"
+
+

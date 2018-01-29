@@ -193,11 +193,19 @@
             gzip $file
         done
 
+    - name: Set log destination for debug job
+      set_fact: log_dst="/srv/logs/debug/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }}/{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}"
+      when: debug_job is defined and debug_job
+
+    - name: Set log destination for normal job
+      set_fact: log_dst="/srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }}"
+      when: debug_job is not defined or not debug_job
+
     - name: Make sure log server folder is empty
       shell: |
-        ssh cloudbase@cloudbase-ci.com -i "{{ log_key }}" "if [ -d /srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }} ];then rm -rf /srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }};fi; mkdir -p /srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }}"
+        ssh cloudbase@cloudbase-ci.com -i "{{ log_key }}" "if [ -d {{ log_dst }} ];then rm -rf {{ log_dst }};fi; mkdir -p {{ log_dst }}"
 
     - name: Upload logs
       shell: |
-        rsync -av -e "ssh -i {{ log_key }}" "{{ log_path }}/" "cloudbase@cloudbase-ci.com:/srv/logs/{{ zuul_project | basename }}/{{ zuul_change }}/{{ zuul_patchset }}"
+        rsync -av -e "ssh -i {{ log_key }}" "{{ log_path }}/" "cloudbase@cloudbase-ci.com:{{ log_dst }}"
 

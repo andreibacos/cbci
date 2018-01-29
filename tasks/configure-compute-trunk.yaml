@@ -4,7 +4,7 @@
 
 - name: Set port trunk
   shell: "/usr/local/bin/wsmancmd -s -H {{ compute_ip.stdout }} -a certificate -c {{ win_crt }} -k {{ win_key }}
-          'powershell (get-vm -name {{ hostvars[item].compute_instance_name }} ^| set-vmnetworkadaptervlan -Trunk -AllowedVlanIdList 1-4094 -NativeVlanId 0'"
+          'powershell get-vm -name {{ hostvars[item].compute_instance_name }} ^| set-vmnetworkadaptervlan -Trunk -AllowedVlanIdList 1-4094 -NativeVlanId 0'"
   args:
     executable: /bin/bash
 

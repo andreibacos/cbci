@@ -1,4 +1,7 @@
 ---
+    - name: Set administrator password to {{ ansible_ssh_pass }}
+      win_shell: "net user administrator {{ ansible_ssh_pass }}"
+
     - include: tasks/windows/create-folders.yaml
 
     - name: Create services and/or stop them if they are running

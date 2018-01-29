@@ -4,41 +4,36 @@
     - zuul-params.yaml
 
   tasks:
-    - name: Creating instances
-      os_server:
-        state: present
-        name: "{{ item.name }}"
-        image: "{{ item.image }}"
-        key_name: default
-        timeout: 300
-        userdata: "{{ item.userdata }}"
-        flavor: "{{ item.flavor }}"
-        config_drive: yes
-        nics:
-          - net-id: "{{ item.network_id }}"
-          - net-id: "{{ item.network_id }}"
-      register: vm_create_out
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      tags: always
+
+    - include: tasks/boot-instance.yaml
       with_items: "{{ vms }}"
+      loop_control:
+        loop_var: vm
 
-    - set_fact:
-        build_hosts: "{{ build_hosts|default([]) + [ {'name': item.item.name, 
-                                                      'ip': item.server.interface_ip, 
-                                                      'group': item.item.inventory_group, 
-                                                      'additional_params': item.item.additional_params,
-                                                      'compute_host': item.server['OS-EXT-SRV-ATTR:host'],
-                                                      'compute_instance_name': item.server['OS-EXT-SRV-ATTR:instance_name']} ] }}"
-      with_items: "{{ vm_create_out.results }}"
+    - copy: 
+        content="{{ vm_data | to_nice_yaml }}"
+        dest="{{ work_dir }}/vm-data.yaml"
 
-    - name: Print build_hosts
-      debug: var=build_hosts
+    - include_vars:
+        file: "{{ work_dir }}/vm-data.yaml"
+        name: vm_data
 
     - name: Generate inventory file
       blockinfile:
         path: "{{ inv_file }}"
         create: yes
         block: |
-          [{{ item.group }}]
-          {{ item.ip }} hostname={{ item.name }} {{ item.additional_params }} compute_host={{ item.compute_host }} compute_instance_name={{ item.compute_instance_name }}
+          [{{ item.inventory_group }}]
+          {{ vm_data[item.name].ports.management.port.fixed_ips[0].ip_address }} hostname={{ item.name }} {{ item.additional_params }} compute_host={{ vm_data[item.name].server['OS-EXT-SRV-ATTR:host'] }} compute_instance_name={{ vm_data[item.name].server['OS-EXT-SRV-ATTR:instance_name'] }}
         marker: "# {mark} {{ item.name }}"
-      with_items: "{{ build_hosts }}"
+      with_items: "{{ vms }}"
 
