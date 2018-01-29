@@ -5,6 +5,16 @@
     - zuul-params.yaml
 
   tasks:
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      tags: always
+
     - name: Configure compute node trunk
       include_tasks: tasks/configure-compute-trunk.yaml
       with_items: "{{ groups['all'] }}"
