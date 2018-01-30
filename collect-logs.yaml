@@ -40,6 +40,16 @@
       failed_when: False
       tags: always
 
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      tags: always
+
     - name: Get log files
       shell: |
         if [ ! -d "{{ item.value.dest }}" ];then
@@ -101,6 +111,16 @@
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
       failed_when: False
       when: job_type is defined
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
       tags: always
 
     - name: Export logs to {{ devstack_dir.stack }}/logs using journalctl
@@ -186,6 +206,25 @@
 
   tasks:
 
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      tags: always
+
+    - name: Copy build files to log folder
+      copy: 
+        src: "{{ item }}"
+        dest: "{{ log_path }}"
+      with_fileglob:
+        - "{{ work_dir }}/*.log"
+        - "{{ console_log }}"
+      failed_when: False
+
     - name: Archive all files in {{ log_path }}
       shell: |
         for file in $(find "{{ log_path }}" -type f)
@@ -208,4 +247,3 @@
     - name: Upload logs
       shell: |
         rsync -av -e "ssh -i {{ log_key }}" "{{ log_path }}/" "cloudbase@cloudbase-ci.com:{{ log_dst }}"
-

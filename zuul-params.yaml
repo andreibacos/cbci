@@ -12,3 +12,4 @@ inv_file: /home/jenkins-slave/workspace/os-brick-iscsi-test2/0b02535d8dd84dbfbf7
 work_dir: /home/jenkins-slave/workspace/os-brick-iscsi-test2/0b02535d8dd84dbfbf7cc0f7958dde85/cbci
 log_path: /tmp/build_logs/537135-2
 vlan_range: 300:349
+console_log: /var/lib/jenkins/jobs/os-brick-iscsi-test2/builds/33/log
