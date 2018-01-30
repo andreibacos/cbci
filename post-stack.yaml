@@ -34,7 +34,7 @@
       when: join_ad is defined and join_ad
 
     - include: tasks/windows/configure-smbshare.yaml
-      when: smbshare is defined and job_type == "smb3-windows"
+      when: smbshare is defined
 
     - name: Configure services with AD user
       set_fact:
@@ -79,6 +79,9 @@
 
     - include: tasks/windows/join-ad.yaml
       when: join_ad is defined and join_ad
+
+    - include: tasks/windows/configure-smbshare.yaml
+      when: smbshare is defined
 
     - include: tasks/windows/enable-live-migration.yaml
       when: join_ad is defined and join_ad
