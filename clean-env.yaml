@@ -1,0 +1,38 @@
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      tags: always
+
+    - name: Include vm-data
+      include_vars:
+        file: "{{ work_dir }}/vm-data.yaml"
+        name: vm_data
+
+    - name: Get all neutron ports that need to be deleted
+      set_fact:
+        ports: "{{ vm_data.values() | map(attribute='ports') | map(attribute='management') | list }} + {{ vm_data.values() | map(attribute='ports') | map(attribute='dataplane') | list }}"
+
+#    - name: Remove instances
+#      os_server:
+#        state: absent
+#        name: "{{ item }}"
+#        timeout: 300
+#      with_items: "{{ vm_data }}"
+
+    - name: Remove neutron ports
+      os_port:
+        state: absent
+        name: "{{ item.port.name }}"
+      with_items: "{{ ports }}"
