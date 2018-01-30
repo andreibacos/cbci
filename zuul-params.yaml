@@ -4,11 +4,11 @@ zuul_url: http://10.106.1.39/p
 zuul_change: 537135
 zuul_patchset: 2
 zuul_branch: master
-zuul_head_only: True
+zuul_head_only: False
 job_type: iscsi
 run_tests: True
-vlan_range: 50:100
 debug_job: True
 inv_file: /home/jenkins-slave/workspace/os-brick-iscsi-test2/0b02535d8dd84dbfbf7cc0f7958dde85/cbci/inv
 work_dir: /home/jenkins-slave/workspace/os-brick-iscsi-test2/0b02535d8dd84dbfbf7cc0f7958dde85/cbci
 log_path: /tmp/build_logs/537135-2
+vlan_range: 300:349

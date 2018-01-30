@@ -1,0 +1,22 @@
+- hosts: 127.0.0.1
+  connection: local
+  gather_facts: no
+  vars:
+    vlan_range_tool: /home/jenkins-slave/vlan_ranges/vlan_range_tool.py  
+
+  tasks:
+    - name: Alocate a VLAN range for this build
+      shell: "./{{ vlan_range_tool | basename}}"
+      args:
+        chdir: "{{ vlan_range_tool | dirname}}"
+      register: vlan_range
+      until: vlan_range.rc == 0
+      retries: 3
+      delay: 5
+      ignore_errors: yes
+
+    - name: Write range to zuul-params.yaml
+      lineinfile:
+        path: zuul-params.yaml
+        regexp: '^vlan_range:'
+        line: "vlan_range: {{ vlan_range.stdout_lines[0] }}"

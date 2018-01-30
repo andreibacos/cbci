@@ -25,4 +25,3 @@ data_bridge: br-data
 
 win2016_compute_nodes: "{{ groups['win2016-compute'] }}"
 devstack_ip: "{{ groups['devstack'][0] }}"
-  
