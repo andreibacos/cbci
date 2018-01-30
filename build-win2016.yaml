@@ -54,6 +54,10 @@
     
     - name: Update setuptools
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
+
+    - name: Installing pip packages
+      win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U {{ python_packages | join(' ') }}"
+      when: python_packages is defined
     
     - include: tasks/windows/install-project.yaml
       with_items: "{{ git_prep_projects }}"

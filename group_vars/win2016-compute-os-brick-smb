@@ -31,6 +31,8 @@ services:
     config: "{{ win_dir.etc }}\\cinder.conf"
     template: cinder.conf
 
+python_packages:
+  - pymysql
 
 #cherry_picks:
 #  - project: openstack/cinder
