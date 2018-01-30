@@ -13,6 +13,7 @@
 
     - name: Grant full share access for domain administrator
       win_shell: "Grant-SmbShareAccess -Name smbshare -AccountName administrator@{{ ad_domain }} -AccessRight Full -Force"
+      when: join_ad is defined and join_ad
       tags: smbshare
 
     - name: Grant full share access for compute machine accounts

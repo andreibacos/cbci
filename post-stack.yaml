@@ -130,7 +130,7 @@
     - include: tasks/devstack/check-devstack-nova-services.yaml
     - include: tasks/devstack/check-devstack-neutron-services.yaml
     - include: tasks/devstack/check-devstack-cinder-services.yaml
-      when: zuul_project == "openstack/cinder" or (zuul_project == "openstack/os-brick" and job_type == "iscsi")
+      when: zuul_project == "openstack/cinder" or zuul_project == "openstack/os-brick"
 
     - include: tasks/devstack/discover-hosts.yaml
 
@@ -174,9 +174,6 @@
         --excluded-tests {{ devstack_dir.home }}/excluded-tests.txt \
         --isolated-tests {{ devstack_dir.home }}/isolated-tests.txt \
         > {{ devstack_dir.home }}/tempest/run-tests.sh.log
-      failed_when: False
       register: tempest_result
       when: run_tests is not defined or run_tests
       tags: run-tests
-
-    - debug: var=tempest_result

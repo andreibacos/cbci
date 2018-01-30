@@ -36,3 +36,4 @@
         state: absent
         name: "{{ item.port.name }}"
       with_items: "{{ ports }}"
+
