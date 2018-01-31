@@ -261,3 +261,5 @@
     - name: Upload logs
       shell: |
         rsync -av -e "ssh -i {{ log_key }}" "{{ log_path }}/" "cloudbase@cloudbase-ci.com:{{ log_dst }}"
+        
+    - file: state=absent path="{{ log_path }}"
