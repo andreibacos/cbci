@@ -222,7 +222,12 @@
         dest: "{{ log_path }}"
       with_fileglob:
         - "{{ work_dir }}/*.log"
-        - "{{ console_log }}"
+      failed_when: False
+
+    - name: Copy jenkins console log
+      copy: 
+        src: "{{ console_log }}"
+        dest: "{{ log_path }}/jenkins-console.log"
       failed_when: False
 
     - name: Archive all files in {{ log_path }}
