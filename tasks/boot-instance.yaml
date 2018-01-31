@@ -22,7 +22,7 @@
       name: "{{ vm.name }}"
       image: "{{ vm.image }}"
       key_name: default
-      timeout: 300
+      timeout: 600
       userdata: "{{ vm.userdata }}"
       flavor: "{{ vm.flavor }}"
       config_drive: yes
