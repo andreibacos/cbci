@@ -5,6 +5,7 @@ git_prep_projects:
   - openstack/nova
   - openstack/neutron
   - openstack/networking-hyperv
+  - openstack/compute-hyperv
   - openstack/os-win
   - openstack/os-brick
 
@@ -35,7 +36,7 @@ services:
 #      - refs/changes/41/403641/4
 #      - refs/changes/19/426719/4
 
-compute_driver: hyperv.driver.HyperVDriver
+compute_driver: compute_hyperv.driver.HyperVDriver
 
 vmswitches:
   - name: "{{ data_bridge }}"
