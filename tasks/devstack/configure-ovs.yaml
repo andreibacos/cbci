@@ -1,6 +1,7 @@
   - name: Create OVS bridge "{{ data_bridge }}"
     openvswitch_bridge:
       bridge: "{{ data_bridge  }}"
+      fail_mode: secure
     when: data_interface is defined
     become: True
     tags: configure-ovs
