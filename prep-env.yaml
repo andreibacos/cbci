@@ -36,4 +36,6 @@
           {{ vm_data[item.name].ports.management.port.fixed_ips[0].ip_address }} hostname={{ item.name }} {{ item.additional_params }} compute_host={{ vm_data[item.name].server['OS-EXT-SRV-ATTR:host'] }} compute_instance_name={{ vm_data[item.name].server['OS-EXT-SRV-ATTR:instance_name'] }}
         marker: "# {mark} {{ item.name }}"
       with_items: "{{ vms }}"
-
+      
+    - file: state=absent path="{{ log_path }}"
+    - file: state=directory path="{{ log_path }}"
