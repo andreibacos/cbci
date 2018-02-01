@@ -164,6 +164,6 @@ tempest_tests:
       tempest.scenario.test_stamp_pattern
       tempest.scenario.test_volume_boot_pattern
 
-  excluded-tests: |
-      tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
+#  excluded-tests: |
+#      tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
 
