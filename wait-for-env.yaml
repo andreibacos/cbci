@@ -5,5 +5,5 @@
   - name: Wait for all VMs to be reachable
     wait_for_connection:
       delay: 3
-      timeout: 300
+      timeout: 600
       sleep: 15
