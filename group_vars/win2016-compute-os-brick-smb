@@ -35,12 +35,11 @@ services:
 python_packages:
   - pymysql
 
-#cherry_picks:
-#  - project: openstack/cinder
-#    path: "{{ win_dir.build }}\\cinder"
-#    patches:
-#      - refs/changes/41/403641/4
-#      - refs/changes/19/426719/4
+cherry_picks:
+  - project: openstack/cinder
+    path: "{{ win_dir.build }}\\cinder"
+    patches:
+      - refs/changes/93/539593/1
 #  - project: openstack/os-win
 #    path: "{{ win_dir.build }}\\os-win"
 #    patches:
