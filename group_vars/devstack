@@ -53,4 +53,4 @@ git_prep_projects:
   - openstack/swift
   - openstack/tempest
 
-image_urls: http://144.76.59.195:8088/cirros-0.3.3-x86_64.vhdx
+image_urls: http://10.100.0.9/ci/cirros-0.3.3-x86_64.vhdx
