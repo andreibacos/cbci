@@ -60,6 +60,8 @@ If (-not $check_mode) {
     if (!(Test-Path $path)) {
         Fail-Json $result "Path $path does not exist"
     } else {
+        Execute-Command -commandTitle "git set global email" -commandPath "git" -commandArguments "config --global user.email cbci@cloudbasesolutions.com"
+        Execute-Command -commandTitle "git set global user" -commandPath "git" -commandArguments "config --global user.name CBCI"
         foreach ($r in $ref) {
             $fetch_result = Execute-Command -commandTitle "git fetch" -commandPath "git" -commandArguments "-C $path fetch $git_url $r"
             $result.output[$r] = @{}
