@@ -1,0 +1,106 @@
+- hosts: devstack
+  vars_files: 
+    - zuul-params.yaml
+
+  tasks:
+    - name: Include variables from group_vars/devstack
+      include_vars: "group_vars/devstack"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      when: job_type is defined
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}
+      include_vars: "job_vars/{{ zuul_project | basename }}"
+      failed_when: False
+      tags: always
+
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      tags: always
+
+    - name: Export logs to {{ devstack_dir.stack }}/logs using journalctl
+      shell: |
+        for u in $(sudo systemctl list-unit-files | grep devstack | awk '{print $1}'); do
+            name=$(echo $u | sed 's/devstack@//' | sed 's/\.service//')
+            sudo journalctl -o short-precise --unit $u > {{ devstack_dir.stack }}/logs/$name.txt
+        done
+      ignore_errors: True
+
+    - name: Create devstack folders
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      with_items:
+        - "{{ log_path }}/devstack/logs"
+        - "{{ log_path }}/devstack/conf"
+        - "{{ log_path }}/tempest"
+      ignore_errors: True
+      delegate_to: 127.0.0.1
+
+    - name: Dump pip list to file
+      shell: pip list > /opt/stack/logs/pip-list.txt
+      become: True
+      ignore_errors: True
+
+    - name: Dump OVS bridge config to file
+      shell: ovs-vsctl -v show > /opt/stack/logs/ovs-bridges.txt
+      become: True
+      ignore_errors: True
+
+    - name: Copy log files
+      synchronize:
+        mode: pull
+        src: "{{ item }}"
+        dest: "{{ log_path }}/devstack/logs"
+        rsync_opts:
+          - "--no-links"
+      ignore_errors: True
+      with_items:
+        - /opt/stack/logs/
+        - /var/log/cloud-init-output.log
+        - /var/log/cloud-init.log
+        - /var/log/syslog
+        - /var/log/mysql/error.log
+        
+    - name: Copy conf files
+      synchronize:
+        mode: pull
+        src: "{{ item }}"
+        dest: "{{ log_path }}/devstack/conf"
+        rsync_opts:
+          - "--no-links"
+      ignore_errors: True
+      with_items:
+        - /etc/neutron
+        - /etc/nova
+        - /etc/cinder
+        - /etc/glance
+        - /etc/keystone
+        - /etc/swift
+        - /etc/openvswitch
+
+    - name: Copy tempest files
+      synchronize:
+        mode: pull
+        src: "{{ item }}"
+        dest: "{{ log_path }}/tempest"
+        rsync_opts:
+          - "--no-links"
+      ignore_errors: True
+      with_items:
+        - /opt/stack/tempest/tempest.log
+        - /opt/stack/tempest/etc/tempest.conf
+        - /home/ubuntu/tempest/
+
