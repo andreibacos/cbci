@@ -77,12 +77,12 @@ fi
 
 echo "$ALL_TESTS" | grep -E "$INCLUDED_TESTS_REGEX" | grep -vE "$EXCLUDED_TESTS_REGEX" | grep -vE "$ISOLATED_TESTS_REGEX" | sed -e 's/\[[^][]*\]//g' > $TEMPEST_LOGS_FOLDER/parallel-testlist.txt
 tox -eall-plugin -- ".*" --concurrency=8 --whitelist-file $TEMPEST_LOGS_FOLDER/parallel-testlist.txt
-testr last --subunit > $TEMPEST_LOGS_FOLDER/subunit.output
+stestr last --subunit > $TEMPEST_LOGS_FOLDER/subunit.output
 
 if [ "$ISOLATED_TESTS_REGEX" != "^no_isolated" ];then
     echo "$ALL_TESTS" | grep -E "$ISOLATED_TESTS_REGEX" | sed -e 's/\[[^][]*\]//g' > $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
     tox -eall-plugin -- ".*" --serial --whitelist-file $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
-    testr last --subunit >> $TEMPEST_LOGS_FOLDER/subunit.output
+    stestr last --subunit >> $TEMPEST_LOGS_FOLDER/subunit.output
 fi
 
 #subunit-stats $TEMPEST_LOGS_FOLDER/subunit.output > /dev/null
