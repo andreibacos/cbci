@@ -67,8 +67,10 @@ fi
 
 pushd /opt/stack/tempest
 
-# use tox to list tests so all dependencies get installed correctly
-ALL_TESTS=$(tox -eall-plugin -- ".*" -l)
+# install all dependencies
+tox -eall-plugin --notest
+
+ALL_TESTS=$(stestr list)
 if [ $? -ne 0 ];then
     echo "Error while listing tests"
     exit 1
@@ -76,12 +78,12 @@ fi
 
 
 echo "$ALL_TESTS" | grep -E "$INCLUDED_TESTS_REGEX" | grep -vE "$EXCLUDED_TESTS_REGEX" | grep -vE "$ISOLATED_TESTS_REGEX" | sed -e 's/\[[^][]*\]//g' > $TEMPEST_LOGS_FOLDER/parallel-testlist.txt
-tox -eall-plugin -- ".*" --concurrency=8 --whitelist-file $TEMPEST_LOGS_FOLDER/parallel-testlist.txt
+stestr run --concurrency=8 --whitelist-file $TEMPEST_LOGS_FOLDER/parallel-testlist.txt
 stestr last --subunit > $TEMPEST_LOGS_FOLDER/subunit.output
 
 if [ "$ISOLATED_TESTS_REGEX" != "^no_isolated" ];then
     echo "$ALL_TESTS" | grep -E "$ISOLATED_TESTS_REGEX" | sed -e 's/\[[^][]*\]//g' > $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
-    tox -eall-plugin -- ".*" --serial --whitelist-file $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
+    stestr run --serial --whitelist-file $TEMPEST_LOGS_FOLDER/isolated-testlist.txt
     stestr last --subunit >> $TEMPEST_LOGS_FOLDER/subunit.output
 fi
 
