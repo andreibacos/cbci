@@ -67,6 +67,11 @@ fi
 
 pushd /opt/stack/tempest
 
+if [ ! -d ".stestr" ]; then
+    echo "Initializing stestr"
+    stestr init
+fi
+
 # install all dependencies
 tox -eall-plugin --notest
 
