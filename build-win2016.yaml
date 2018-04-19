@@ -48,6 +48,9 @@
     - include: tasks/windows/install-zuul.yaml
     - include: tasks/windows/prepare-git-repos.yaml
     
+    - include: tasks/windows/configure-ovs.yaml
+      when: use_ovs
+    
     - name: Update setuptools
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
 

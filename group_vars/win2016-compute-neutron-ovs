@@ -4,10 +4,10 @@ git_prep_projects:
   - openstack/requirements
   - openstack/nova
   - openstack/neutron
-  - openstack/networking-hyperv
   - openstack/compute-hyperv
   - openstack/os-win
-
+##  - openstack/networking-hyperv
+  
 services:
   - nova:
     name: nova-compute
@@ -18,10 +18,10 @@ services:
 
   - neutron:
     name: neutron-hyperv-agent
-    description: OpenStack Neutron Hyper-V Agent Service
-    binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
-    config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
-    template: neutron-hyperv-agent.conf
+    description: OpenStack Neutron OVS Agent Service
+    binary: "{{ win_dir.python }}\\scripts\\neutron-openvswitch-agent.exe"
+    config: "{{ win_dir.etc }}\\neutron-ovs-agent.conf"
+    template: neutron-ovs-agent.conf
 
 #cherry_picks:
 #  - project: openstack/cinder
