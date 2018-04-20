@@ -3,7 +3,6 @@
       win_package:
         path: "{{ ovs_msi_url }}"
         productid: '{A5CE0CD6-AABF-42AB-B52D-077492FF41A6}'
-        arguments: '/i'
         ensure: present
         expected_return_code: 0
       tags: configure-ovs
@@ -31,7 +30,7 @@
       tags: configure-ovs
     
     - name: Retrieve data network interface
-      win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "{{ data_network.split('.')[0:3]|join('.') }}"}|Select-Object InterfaceAlias).InterfaceAlias'
+      win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "{{ data_network.split(".")[0:3]|join(".") }}"}|Select-Object InterfaceAlias).InterfaceAlias'
       register: interface
       tags: configure-ovs
     
