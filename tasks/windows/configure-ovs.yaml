@@ -4,7 +4,6 @@
         path: "{{ ovs_msi_url }}"
         productid: '{A5CE0CD6-AABF-42AB-B52D-077492FF41A6}'
         ensure: present
-        expected_return_code: 0
       tags: configure-ovs
       
     - name: Check if OVS extension is installed
