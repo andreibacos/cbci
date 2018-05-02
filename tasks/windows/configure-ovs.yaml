@@ -7,35 +7,35 @@
       tags: configure-ovs
       
     - name: Check if OVS extension is installed
-      win_shell: 'Get-VMSwitchExtension -VMSwitchName {{ vmswitches.name }} -Name "Cloudbase Open vSwitch Extension"'
+      win_shell: 'Get-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       register: result
       tags: configure-ovs
       
-    - name: Enable OVS extension on {{ vmswitches.name }}
-      win_shell: 'Enable-VMSwitchExtension -VMSwitchName {{ vmswitches.name }} -Name "Cloudbase Open vSwitch Extension"'
+    - name: Enable OVS extension on {{ item.name }}
+      win_shell: 'Enable-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       when: result.rc == 0
       tags: configure-ovs
       
-    - name: Add OVS binaries in PATH
-      win_path:
-        elements:
-          - 'C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\bin'
-      tags: configure-ovs
+    # - name: Add OVS binaries in PATH
+      # win_path:
+        # elements:
+          # - 'C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\bin'
+      # tags: configure-ovs
           
-    - name: Create {{ data_bridge }}
-      openvswitch_bridge:
-        bridge: "{{ data_bridge }}"
-        state: present
-      tags: configure-ovs
+    # - name: Create {{ data_bridge }}
+      # openvswitch_bridge:
+        # bridge: "{{ data_bridge }}"
+        # state: present
+      # tags: configure-ovs
     
-    - name: Retrieve data network interface
-      win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "{{ data_network.split(".")[0:3]|join(".") }}"}|Select-Object InterfaceAlias).InterfaceAlias'
-      register: interface
-      tags: configure-ovs
+    # - name: Retrieve data network interface
+      # win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "{{ data_network.split(".")[0:3]|join(".") }}"}|Select-Object InterfaceAlias).InterfaceAlias'
+      # register: interface
+      # tags: configure-ovs
     
-    - name: Add the port in {{ data_bridge }}
-      openvswitch_port:
-        bridge: "{{ data_bridge }}"
-        port: "{{ interface.stdout }}"
-        state: present
-      tags: configure-ovs        
+    # - name: Add the port in {{ data_bridge }}
+      # openvswitch_port:
+        # bridge: "{{ data_bridge }}"
+        # port: "{{ interface.stdout }}"
+        # state: present
+      # tags: configure-ovs        

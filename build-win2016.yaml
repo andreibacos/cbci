@@ -49,6 +49,7 @@
     - include: tasks/windows/prepare-git-repos.yaml
     
     - include: tasks/windows/configure-ovs.yaml
+      with_items: "{{ vmswitches }}"
       when: use_ovs
     
     - name: Update setuptools
