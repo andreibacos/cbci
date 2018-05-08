@@ -16,6 +16,12 @@
       failed_when: False
       tags: always
 
+    - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}
+      include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}"
+      when: network_type is defined
+      failed_when: False
+      tags: always
+      
     # Run sanity checks as early as possible
     - include: tasks/windows/sanity-checks.yaml
     - name: Install FS-iSCSITarget-Server
