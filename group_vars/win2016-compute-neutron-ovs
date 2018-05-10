@@ -17,7 +17,7 @@ services:
     template: nova.conf
 
   - neutron:
-    name: neutron-hyperv-agent
+    name: neutron-ovs-agent
     description: OpenStack Neutron OVS Agent Service
     binary: "{{ win_dir.python }}\\scripts\\neutron-openvswitch-agent.exe"
     config: "{{ win_dir.etc }}\\neutron-ovs-agent.conf"
