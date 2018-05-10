@@ -10,6 +10,10 @@
 #    patches:
 #      - refs/changes/25/473525/3
 
+enable_tenant_vlans: false
+enable_tenant_tunnels: true
+q_ml2_tenant_network_type: vxlan
+
 tempest_tests:
   included-tests: |
       tempest.

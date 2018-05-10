@@ -22,6 +22,10 @@ zuul_version: zuul==2.5.2
 # the inteface in this subnet will be used when creating vmswitches and ovs bridges
 data_network: 192.168.0.0/22
 data_bridge: br-data
+enable_tenant_vlans: true
+enable_tenant_tunnels: false
+q_ml2_tenant_network_type: vlan
+
 
 win2016_compute_nodes: "{{ groups['win2016-compute'] }}"
 devstack_ip: "{{ groups['devstack'][0] }}"
