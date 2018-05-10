@@ -7,7 +7,7 @@ vms:
     additional_params: 'ansible_ssh_private_key_file=/home/jenkins-slave/.ssh/id_rsa.pem ansible_ssh_common_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"'
     userdata: ""
   - hv2016-compute: 
-    name: "hv-netron-{{ zuul_change }}-{{ zuul_patchset }}-{{ job_type }}"
+    name: "hv-neutron-{{ zuul_change }}-{{ zuul_patchset }}-{{ job_type }}"
     image: win2016-hypervrole
     flavor: win2016hv
     inventory_group: win2016-compute
