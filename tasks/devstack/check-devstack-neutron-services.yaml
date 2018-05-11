@@ -1,7 +1,7 @@
     - name: Check if neutron agents are up, looking for {{ win2016_compute_nodes | length }} compute nodes
       shell: |
         source /home/ubuntu/keystonerc
-        NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)")
+        NEUTRON_COUNT=$(neutron agent-list | grep -c "{{ search_string }}")
         if [ $NEUTRON_COUNT -ne "{{ win2016_compute_nodes | length }}" ];then
             neutron agent-list
             exit 1
@@ -13,6 +13,8 @@
       until: neutron_service_check.rc == 0
       retries: "{{ service_check_retries }}"
       delay: "{{ service_check_delay }}"
+      set_fact: search_string="HyperV agent.*:-)"
+      when: not use_ovs
       ignore_errors: yes
 
     - name: Show neutron agents output
