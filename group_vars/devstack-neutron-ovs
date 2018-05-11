@@ -14,6 +14,7 @@ enable_tenant_vlans: false
 enable_tenant_tunnels: true
 q_ml2_tenant_network_type: vxlan
 search_string: "Open vSwitch.*hv.*:-)"
+use_ovs: true
 
 tempest_tests:
   included-tests: |
