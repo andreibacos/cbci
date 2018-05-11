@@ -15,12 +15,6 @@
       win_shell: 'Enable-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       when: result.rc == 0
       tags: configure-ovs
-      
-    # - name: Add OVS binaries in PATH
-      # win_path:
-        # elements:
-          # - 'C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\bin'
-      # tags: configure-ovs
           
     # - name: Create {{ data_bridge }}
       # openvswitch_bridge:
