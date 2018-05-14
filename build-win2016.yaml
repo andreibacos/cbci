@@ -4,6 +4,15 @@
 
     - include: tasks/windows/create-folders.yaml
 
+    - name: Disable firewall for Domain, Public and Private profiles
+      win_firewall:
+        state: disabled
+        profiles:
+        - Domain
+        - Private
+        - Public
+      tags: disable_firewall
+
     - name: Create services and/or stop them if they are running
       win_service:
         name: "{{ item.name }}"
