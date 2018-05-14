@@ -38,8 +38,8 @@ services:
 cherry_picks:
   - project: openstack/neutron
     path: "{{ win_dir.build }}\\neutron"
-	patches:
-	  - refs/changes/21/567621/4
+    patches:
+      - refs/changes/21/567621/4
 
 compute_driver: compute_hyperv.driver.HyperVDriver
 
