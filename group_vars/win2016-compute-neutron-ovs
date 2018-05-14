@@ -34,6 +34,7 @@ services:
 #    patches:
 #      - refs/changes/41/403641/4
 #      - refs/changes/19/426719/4
+
 cherry_picks:
   - project: openstack/neutron
     path: "{{ win_dir.build }}\\neutron"
