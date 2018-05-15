@@ -16,13 +16,13 @@
       when: result.rc == 0
       tags: configure-ovs
 
-    # - name: Add configure-ovs-bridge ps script
-      # win_template:
-        # src: windows/configure-ovs-bridge.ps1
-        # dest: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
+    - name: Add configure-ovs-bridge ps script
+      win_template:
+        src: windows/configure-ovs-bridge.ps1
+        dest: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
 
-    # - name: Run configure-ovs-bridge ps script
-      # win_shell: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
+    - name: Run configure-ovs-bridge ps script
+      win_shell: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
 
     # - name: Create {{ data_bridge }}
       # openvswitch_bridge:
