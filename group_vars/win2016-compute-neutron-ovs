@@ -35,11 +35,13 @@ services:
 #      - refs/changes/41/403641/4
 #      - refs/changes/19/426719/4
 
-cherry_picks:
-  - project: openstack/neutron
-    path: "{{ win_dir.build }}\\neutron"
-    patches:
-      - refs/changes/21/567621/4
+
+## commented cherry pick used only for master branch
+#cherry_picks:
+#  - project: openstack/neutron
+#    path: "{{ win_dir.build }}\\neutron"
+#    patches:
+#      - refs/changes/21/567621/4
 
 compute_driver: compute_hyperv.driver.HyperVDriver
 
