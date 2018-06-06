@@ -1,3 +1,10 @@
+###task for route eth0 / eth1 remove with failed when false
+  - name: Remove unwanted routes to data_plane network
+    shell: |
+      ip route del 192.168.0.0/22 eth0
+      ip route del 192.168.0.0/22 eth1
+    failed_when: False
+
   - name: Run stack
     shell: |
       ./unstack.sh > /dev/null 2>&1
