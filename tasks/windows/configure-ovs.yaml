@@ -5,16 +5,41 @@
         productid: '{A5CE0CD6-AABF-42AB-B52D-077492FF41A6}'
         ensure: present
       tags: configure-ovs
-      
+
+    - name: Expose tcp port for OVS for remote control
+      win_service:
+        name: ovsdb-server
+        path: "\"C:\Program Files\Cloudbase Solutions\Open vSwitch\bin\ovsdb-server.exe\" \-\-log-file=\"C:\Program Files\Cloudbase Solutions\Open vSwitch\logs\ovsdb-server.log\" \-\-pidfile \-\-service \-\-unixctl=\"C:\ProgramData\openvswitch\ovsdb-server.ctl\" \-\-remote=punix:\"C:\ProgramData\openvswitch\db.sock\" \-\-remote=ptcp:6640 \-\-remote=db:Open_vSwitch,Open_vSwitch,manager_options \"C:\Program Files\Cloudbase Solutions\Open vSwitch\conf\conf.db\""
+        state: stopped
+
+    - name: Restart OVS services
+      win_service:
+        name: "{{ item }}"
+        state: restarted
+        force_dependent_services: yes
+      with_items: ["ovsdb-server", "ovs-vswitchd"]
+
     - name: Check if OVS extension is installed
       win_shell: 'Get-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       register: result
       tags: configure-ovs
-      
+
     - name: Enable OVS extension on {{ item.name }}
       win_shell: 'Enable-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       when: result.rc == 0
       tags: configure-ovs
+
+    - name: Create br-ethernet bridge in OVS
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-br br-ethernet"
+
+    - name: Add dataplane interface in br-ethernet
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-port br-ethernet \"Ethernet 2\""
+
+    - name: Enable br-ethernet adapter
+      win_shell: "Enable-NetAdapter br-ethernet"
+
+    - name: Add IP Address on br-ethernet
+      win_shell: "New-NetIPAddress -IPAddress {{ ansible_ip_addresses | ipaddr('192.168.0.0/22') | first }} -InterfaceAlias br-ethernet -PrefixLength 22"
 
     # - name: Add configure-ovs-bridge ps script
       # win_template:
