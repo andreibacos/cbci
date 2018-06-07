@@ -36,7 +36,10 @@
         src: "windows/policy.json"
         dest: "{{ win_dir.etc }}\\policy.json"
       tags: create-configs
- 
+## must be modified; meanwhile it works for one compute node;
+    - name: Get compute node IP
+      set_fact: compute_local_ip="{{ ansible_ip_addresses | ipaddr('192.168.0.0/22') | first }}"
+
     - name: Create vmswitches
       cb_vmswitch:
         name: "{{ item.name }}"
