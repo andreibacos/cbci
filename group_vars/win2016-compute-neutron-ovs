@@ -41,7 +41,7 @@ services:
 #  - project: openstack/neutron
 #    path: "{{ win_dir.build }}\\neutron"
 #    patches:
-#      - refs/changes/21/567621/4
+#      - refs/changes/21/567621/6
 
 compute_driver: compute_hyperv.driver.HyperVDriver
 
@@ -51,7 +51,7 @@ python_packages:
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
-    management: True
+    management: False
 
 win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
 use_ovs: True

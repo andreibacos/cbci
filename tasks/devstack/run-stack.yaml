@@ -1,8 +1,9 @@
-###task for route eth0 / eth1 remove with failed when false
+### these 2 routes on eth0 & eth1 don't need to be added on the first place
   - name: Remove unwanted routes to data_plane network
     shell: |
-      ip route del 192.168.0.0/22 eth0
-      ip route del 192.168.0.0/22 eth1
+      ip route del 192.168.0.0/22 dev eth0
+      ip route del 192.168.0.0/22 dev eth1
+    become: True
     failed_when: False
 
   - name: Run stack
