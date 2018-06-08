@@ -24,13 +24,16 @@
       with_items: "{{ services }}"
       tags: create-services
 
+    - name: Get LOCAL_IP address
+      set_fact: compute_local_ip={{ ansible_ip_addresses | ipaddr('192.168.0.0/22') | first }}
+
     - name: Create config files
       win_template:
         src: "windows/{{ item.template }}"
         dest: "{{ item.config}}"
       with_items: "{{ services }}"
       tags: create-configs
-  
+
     - name: Create policy.json
       win_template:
         src: "windows/policy.json"
