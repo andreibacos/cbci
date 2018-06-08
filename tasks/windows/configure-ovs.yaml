@@ -16,12 +16,22 @@
         name: "ovsdb-server"
         state: restarted
         force_dependent_services: yes
+      tags: configure-ovs
 
     - name: Restart ovs-vswitchd
       win_service:
         name: "ovs-vswitchd"
         state: restarted
         force_dependent_services: yes
+      tags: configure-ovs
+
+    - name: Remove {{ data_bridge }} vmswitch
+      win_shell: "Remove-VMSwitch {{ data_bridge }}"
+      tags: configure-ovs
+
+    - name: Create {{ data_bridge }} vmswitch
+      win_shell: "New-VMSwitch -Name {{ data_bridge }} -NetAdapterName ${{ compute_dataplane_interface_name }} -AllowManagementOS $false"
+      tags: configure-ovs
 
     - name: Check if OVS extension is installed
       win_shell: 'Get-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
@@ -31,6 +41,22 @@
     - name: Enable OVS extension on {{ item.name }}
       win_shell: 'Enable-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       when: result.rc == 0
+      tags: configure-ovs
+
+    - name: Add {{ data_bridge_ovs }} in OVS
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-br {{ data_bridge_ovs }}"
+      tags: configure-ovs
+
+    - name: Add dataplane interface in {{ data_bridge_ovs }}
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-port {{ data_bridge_ovs }} {{ compute_dataplane_interface_name }}"
+      tags: configure-ovs
+
+    - name: Enable {{ data_bridge_ovs }} adapter
+      win_shell: "Enable-NetAdapter {{ data_bridge_ovs }}"
+      tags: configure-ovs
+
+    - name: Add dataplane interface ip on {{ data_bridge_ovs }}
+      win_shell: "New-NetIPAddress -IPAddress {{ compute_local_ip }} -InterfaceAlias {{ data_bridge_ovs }} -PrefixLength 22"
       tags: configure-ovs
 
     # - name: Create br-ethernet bridge in OVS
@@ -45,13 +71,13 @@
     # - name: Add IP Address on br-ethernet
       # win_shell: "New-NetIPAddress -IPAddress {{ compute_local_ip }} -InterfaceAlias br-ethernet -PrefixLength 22"
 
-    - name: Add configure-ovs-bridge ps script
-      win_template:
-        src: windows/configure-ovs-bridge.ps1
-        dest: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
+    # - name: Add configure-ovs-bridge ps script
+      # win_template:
+        # src: windows/configure-ovs-bridge.ps1
+        # dest: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
 
-    - name: Run configure-ovs-bridge ps script
-      win_shell: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
+    # - name: Run configure-ovs-bridge ps script
+      # win_shell: "{{ win_dir.tmp }}\\configure-ovs-bridge.ps1"
 
     # - name: Create {{ data_bridge }}
       # openvswitch_bridge:

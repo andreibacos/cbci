@@ -1,6 +1,4 @@
 ---
-    - debug: var={{ hostvars[inventory_hostname] }}
-
     - name: Set administrator password to {{ ansible_ssh_pass }}
       win_shell: "net user administrator {{ ansible_ssh_pass }}"
 
@@ -26,10 +24,20 @@
       with_items: "{{ services }}"
       tags: create-services
 
-    - debug: var={{ hostvars[inventory_hostname] }}
+    - name: Retrieve data network interface
+      win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "192.168.0"}|Select-Object InterfaceAlias).InterfaceAlias'
+      register: interface
+      tags: configure-ovs
 
-    - name: Get LOCAL_IP address
-      set_fact: compute_local_ip={{ ansible_ip_addresses | ipaddr('192.168.0.0/22') | first }}
+    - name: Set dataplane interface name
+      set_fact: compute_dataplane_interface_name={{ interface.stdout }}
+
+    - name: Get IP address of data interface
+      win_shell: "(Get-NetIPAddress -AddressFamily ipv4 |Where-Object {$_.InterfaceAlias -match \"{{ interface.stdout }}\"}|Select-Object IPAddress).IPAddress"
+      register: interface_ip
+
+    - name: Set dataplane interface IP
+      set_fact: compute_local_ip={{ interface_ip.stdout }}
 
     - name: Create config files
       win_template:
