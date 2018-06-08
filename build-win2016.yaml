@@ -24,6 +24,8 @@
       with_items: "{{ services }}"
       tags: create-services
 
+    - debug: var={{ hostvars[inventory_hostname] }}
+
     - name: Get LOCAL_IP address
       set_fact: compute_local_ip={{ ansible_ip_addresses | ipaddr('192.168.0.0/22') | first }}
 
