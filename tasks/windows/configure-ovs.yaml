@@ -9,7 +9,7 @@
     - name: Expose tcp port for OVS for remote control
       win_service:
         name: ovsdb-server
-        path: "\"C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\bin\\ovsdb-server.exe\" --log-file=\"C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\logs\\ovsdb-server.log\" --pidfile --service --unixctl=\"C:\\ProgramData\\openvswitch\\ovsdb-server.ctl\" --remote=punix:\"C:\\ProgramData\\openvswitch\\db.sock\\" --remote=ptcp:6640 --remote=db:Open_vSwitch,Open_vSwitch,manager_options \"C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\conf\\conf.db\""
+        path: '\"C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\bin\\ovsdb-server.exe\" --log-file=\"C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\logs\\ovsdb-server.log\" --pidfile --service --unixctl=\"C:\\ProgramData\\openvswitch\\ovsdb-server.ctl\" --remote=punix:\"C:\\ProgramData\\openvswitch\\db.sock\\" --remote=ptcp:6640 --remote=db:Open_vSwitch,Open_vSwitch,manager_options \"C:\\Program Files\\Cloudbase Solutions\\Open vSwitch\\conf\\conf.db\"'
         state: stopped
 
     - name: Restart OVS services
@@ -39,7 +39,7 @@
       win_shell: "Enable-NetAdapter br-ethernet"
 
     - name: Add IP Address on br-ethernet
-      win_shell: "New-NetIPAddress -IPAddress {{ ansible_ip_addresses | ipaddr('192.168.0.0/22') | first }} -InterfaceAlias br-ethernet -PrefixLength 22"
+      win_shell: "New-NetIPAddress -IPAddress {{ compute_local_ip }} -InterfaceAlias br-ethernet -PrefixLength 22"
 
     # - name: Add configure-ovs-bridge ps script
       # win_template:
