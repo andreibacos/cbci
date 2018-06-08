@@ -10,8 +10,6 @@
       win_service:
         name: ovsdb-server
         path: '"C:\Program Files\Cloudbase Solutions\Open vSwitch\bin\ovsdb-server.exe" --log-file="C:\Program Files\Cloudbase Solutions\Open vSwitch\logs\ovsdb-server.log" --pidfile --service --unixctl="C:\ProgramData\openvswitch\ovsdb-server.ctl" --remote=punix:"C:\ProgramData\openvswitch\db.sock\" --remote=ptcp:6640 --remote=db:Open_vSwitch,Open_vSwitch,manager_options "C:\Program Files\Cloudbase Solutions\Open vSwitch\conf\conf.db"'
-        state: stopped
-        force_dependent_services: yes
 
     - name: Restart OVS services
       win_service:
