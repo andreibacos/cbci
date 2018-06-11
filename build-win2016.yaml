@@ -54,6 +54,12 @@
 
     - debug: msg={{ result }}
 
+    - name: adapter_name
+      debug: msg={{ interface_details.adapter_name }}
+
+    - name: adapter_ip
+      debug: msg={{ interface_details.adapter_ip }}
+
     - name: Create config files
       win_template:
         src: "windows/{{ item.template }}"
