@@ -117,7 +117,8 @@ If (-not $check_mode) {
                 } else {
                     try {
                         New-VMSwitch -Name $name -NetAdapterName $adapter.interfacealias -AllowManagementOS $management
-                        $result.interface_details.add('adapter_name', $adapter.interfacealias).add('adapter_ip', $adapter.ipaddress)
+                        $result.interface_details.Add('adapter_name', $adapter.interfacealias)
+						$result.interface_details.Add('adapter_ip', $adapter.ipaddress)
 						$result.changed = $true
                         Exit-Json $result
                     } catch {
