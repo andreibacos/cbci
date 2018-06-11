@@ -37,9 +37,11 @@
 
     - name: Set compute_local_ip variable
       set_fact: compute_local_ip={{ op.results[0].interface_details.adapter_ip }}
+      failed_when: False
 
     - name: Set compute_dataplane_interface_name variable
       set_fact: compute_dataplane_interface_name={{ op.results[0].interface_details.adapter_name }}
+      failed_when: False
 
     - name: Create config files
       win_template:
