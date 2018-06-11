@@ -24,20 +24,22 @@
       with_items: "{{ services }}"
       tags: create-services
 
-    - name: Retrieve data network interface
-      win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "192.168.0"}|Select-Object InterfaceAlias).InterfaceAlias'
-      register: interface
-      tags: configure-ovs
+      ##check if vmswitch exists => next 4 tasks with when: var is true
 
-    - name: Set dataplane interface name
-      set_fact: compute_dataplane_interface_name={{ interface.stdout }}
+    # - name: Retrieve data network interface
+      # win_shell: '(Get-NetIPAddress -AddressFamily ipv4 | Where-Object {$_.IPAddress -match "192.168.0"}|Select-Object InterfaceAlias).InterfaceAlias'
+      # register: interface
+      # tags: configure-ovs
 
-    - name: Get IP address of data interface
-      win_shell: "(Get-NetIPAddress -AddressFamily ipv4 |Where-Object {$_.InterfaceAlias -match \"{{ interface.stdout }}\"}|Select-Object IPAddress).IPAddress"
-      register: interface_ip
+    # - name: Set dataplane interface name
+      # set_fact: compute_dataplane_interface_name={{ interface.stdout }}
 
-    - name: Set dataplane interface IP
-      set_fact: compute_local_ip={{ interface_ip.stdout }}
+    # - name: Get IP address of data interface
+      # win_shell: "(Get-NetIPAddress -AddressFamily ipv4 |Where-Object {$_.InterfaceAlias -match \"{{ interface.stdout }}\"}|Select-Object IPAddress).IPAddress"
+      # register: interface_ip
+
+    # - name: Set dataplane interface IP
+      # set_fact: compute_local_ip={{ interface_ip.stdout }}
 
     - name: Create config files
       win_template:

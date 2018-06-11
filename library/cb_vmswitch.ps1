@@ -55,6 +55,7 @@ Function ip_in_subnet {
     } 
 }
 $result.log = @()
+$result.interface_details =@{}
 
 If (-not $check_mode) {
     $VMswitches = Get-VMSwitch -SwitchType External -ErrorAction SilentlyContinue
@@ -116,7 +117,8 @@ If (-not $check_mode) {
                 } else {
                     try {
                         New-VMSwitch -Name $name -NetAdapterName $adapter.interfacealias -AllowManagementOS $management
-                        $result.changed = $true
+                        $result.interface_details.add('adapter_name', $adapter.interfacealias).add('adapter_ip', $adapter.ipaddress)
+						$result.changed = $true
                         Exit-Json $result
                     } catch {
                         Fail-Json $result $_.Exception.Message
