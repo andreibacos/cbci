@@ -49,16 +49,18 @@
         state: present
       with_items: "{{ vmswitches }}"
       when: vmswitches is defined
-      register: result
+      register: op
       tags: create-vmswitch
 
-    - debug: msg={{ result }}
+    - debug: msg={{ op }}
 
     - name: adapter_name
-      debug: msg={{ result.interface_details.adapter_name }}
+      debug: msg={{ op.interface_details.adapter_name }}
+      failed_when: False
 
     - name: adapter_ip
-      debug: msg={{ result.interface_details.adapter_ip }}
+      debug: msg={{ op.interface_details.adapter_ip }}
+      failed_when: False
 
     - name: Create config files
       win_template:
