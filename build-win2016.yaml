@@ -52,8 +52,7 @@
       register: result
       tags: create-vmswitch
 
-    - debug: msg="{{ item }}"
-      with_dict: result
+    - debug: msg={{ result }}
 
     - name: Create config files
       win_template:
