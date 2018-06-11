@@ -41,6 +41,16 @@
     # - name: Set dataplane interface IP
       # set_fact: compute_local_ip={{ interface_ip.stdout }}
 
+    - name: Create vmswitches
+      cb_vmswitch:
+        name: "{{ item.name }}"
+        management: "{{ item.management }}"
+        subnet: "{{ item.subnet }}"
+        state: present
+      with_items: "{{ vmswitches }}"
+      when: vmswitches is defined
+      tags: create-vmswitch
+
     - name: Create config files
       win_template:
         src: "windows/{{ item.template }}"
@@ -53,16 +63,6 @@
         src: "windows/policy.json"
         dest: "{{ win_dir.etc }}\\policy.json"
       tags: create-configs
-
-    - name: Create vmswitches
-      cb_vmswitch:
-        name: "{{ item.name }}"
-        management: "{{ item.management }}"
-        subnet: "{{ item.subnet }}"
-        state: present
-      with_items: "{{ vmswitches }}"
-      when: vmswitches is defined
-      tags: create-vmswitch
 
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml
