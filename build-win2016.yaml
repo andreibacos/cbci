@@ -55,11 +55,11 @@
     - debug: msg={{ op }}
 
     - name: adapter_name
-      debug: msg={{ op.interface_details.adapter_name }}
+      debug: msg={{ op.results[0].interface_details.adapter_name }}
       failed_when: False
 
     - name: adapter_ip
-      debug: msg={{ op.interface_details.adapter_ip }}
+      debug: msg={{ op.results[0].interface_details.adapter_ip }}
       failed_when: False
 
     - name: Create config files
