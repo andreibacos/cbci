@@ -52,7 +52,7 @@
       register: result
       tags: create-vmswitch
 
-    - debug: var={{ result.stdout }}
+    - debug: var={{ result }}
 
     - name: Create config files
       win_template:
