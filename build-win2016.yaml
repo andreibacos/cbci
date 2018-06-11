@@ -52,7 +52,7 @@
       register: result
       tags: create-vmswitch
 
-    - debug: msg="{{ item.key }}: {{ item.value }}"
+    - debug: msg="{{ item }}"
       with_dict: result
 
     - name: Create config files
