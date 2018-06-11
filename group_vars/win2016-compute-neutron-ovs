@@ -51,7 +51,7 @@ python_packages:
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
-    management: True
+    management: False
 
 data_bridge_ovs: br-ethernet
 compute_local_ip: ""
