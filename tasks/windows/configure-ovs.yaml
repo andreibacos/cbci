@@ -25,14 +25,6 @@
         force_dependent_services: yes
       tags: configure-ovs
 
-    - name: Remove {{ data_bridge }} vmswitch
-      win_shell: "Remove-VMSwitch {{ data_bridge }}"
-      tags: configure-ovs
-
-    - name: Create {{ data_bridge }} vmswitch
-      win_shell: "New-VMSwitch -Name {{ data_bridge }} -NetAdapterName ${{ compute_dataplane_interface_name }} -AllowManagementOS $false"
-      tags: configure-ovs
-
     - name: Check if OVS extension is installed
       win_shell: 'Get-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
       register: result
