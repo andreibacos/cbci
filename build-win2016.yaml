@@ -52,8 +52,6 @@
     # - name: debug compute_local_ip
       # debug: msg="{{ compute_dataplane_interface_name }}"
 
-    - name: Check if config files exists
-
     - name: Create config files
       win_template:
         src: "windows/{{ item.template }}"
