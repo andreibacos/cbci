@@ -40,14 +40,14 @@
 
     - name: Set compute_local_ip variable
       set_fact: compute_local_ip={{ op.results[0].interface_details.adapter_ip }}
-      when: (op is defined) and (not (op is none))
+      when: (op.interface_details is defined) and (not (op.interface_details is none))
 
     - name: debug compute_local_ip
       debug: msg="{{ compute_local_ip }}"
 
     - name: Set compute_dataplane_interface_name variable
       set_fact: compute_dataplane_interface_name={{ op.results[0].interface_details.adapter_name }}
-      when: (op is defined) and (not (op is none))
+      when: (op.interface_details is defined) and (not (op.interface_details is none))
 
     - name: debug compute_local_ip
       debug: msg="{{ compute_dataplane_interface_name }}"
