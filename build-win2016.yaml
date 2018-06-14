@@ -57,7 +57,7 @@
         src: "windows/{{ item.template }}"
         dest: "{{ item.config}}"
       with_items: "{{ services }}"
-      failed_when: compute_local_ip is not defined
+      failed_when: False
       tags: create-configs
 
     - name: Create policy.json
