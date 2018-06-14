@@ -5,10 +5,10 @@ git_prep_projects:
   - openstack/cinder
   - openstack/nova
   - openstack/neutron
-  - openstack/networking-hyperv
   - openstack/compute-hyperv
   - openstack/os-win
   - openstack/os-brick
+##  - openstack/networking-hyperv
 
 services:
   - nova:
@@ -34,6 +34,7 @@ services:
 
 python_packages:
   - pymysql
+  - ovs
 
 cherry_picks:
   - project: openstack/cinder
@@ -60,9 +61,6 @@ vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
     management: False
-
-python_packages:
-  - ovs
 
 volume_driver: cinder.volume.drivers.windows.smbfs.WindowsSmbfsDriver
 smbshare: 'c:\smbshare'
