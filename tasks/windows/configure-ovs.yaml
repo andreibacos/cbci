@@ -42,7 +42,7 @@
 
     - name: Add {{ data_bridge_ovs }} in OVS
       win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-br {{ data_bridge_ovs }}"
-      when: (not (result.stdout is none))
+      when: result.stdout is none
       tags: configure-ovs
 
     - name: Add dataplane interface in {{ data_bridge_ovs }}
