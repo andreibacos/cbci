@@ -12,6 +12,12 @@ zuul_head_only: True
 #      - refs/changes/41/403641/4
 #      - refs/changes/19/426719/4
 
+enable_tenant_vlans: false
+enable_tenant_tunnels: true
+q_ml2_tenant_network_type: vxlan
+neutron_agent_search_string: "Open vSwitch.*hv.*:-)"
+use_ovs: true
+
 local_conf:
   enable_services:
     - rabbit

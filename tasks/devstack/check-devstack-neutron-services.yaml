@@ -1,11 +1,11 @@
-    - name: Set search_string parameter
-      set_fact: search_string="HyperV agent.*:-)"
+    - name: Set neutron_agent_search_string parameter
+      set_fact: neutron_agent_search_string="HyperV agent.*:-)"
       when: not use_ovs
 
     - name: Check if neutron agents are up, looking for {{ win2016_compute_nodes | length }} compute nodes
       shell: |
         source /home/ubuntu/keystonerc
-        NEUTRON_COUNT=$(neutron agent-list | grep -c "{{ search_string }}")
+        NEUTRON_COUNT=$(neutron agent-list | grep -c "{{ neutron_agent_search_string }}")
         if [ $NEUTRON_COUNT -ne "{{ win2016_compute_nodes | length }}" ];then
             neutron agent-list
             exit 1
