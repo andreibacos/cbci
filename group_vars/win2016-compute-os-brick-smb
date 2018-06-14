@@ -59,10 +59,10 @@ use_ovs: True
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
-    management: True
+    management: False
 
 python_packages:
   - ovs
-	
+
 volume_driver: cinder.volume.drivers.windows.smbfs.WindowsSmbfsDriver
 smbshare: 'c:\smbshare'
