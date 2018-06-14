@@ -45,7 +45,6 @@ python_packages:
 
 compute_driver: compute_hyperv.driver.HyperVDriver
 data_bridge_ovs: br-ethernet
-compute_local_ip: ""
 win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
 use_ovs: True
 
