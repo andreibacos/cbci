@@ -68,7 +68,7 @@
     
     - include: tasks/windows/configure-ovs.yaml
       with_items: "{{ vmswitches }}"
-      when: use_ovs and network_type is defined
+      when: use_ovs
     
     - name: Update setuptools
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
