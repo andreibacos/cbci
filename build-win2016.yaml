@@ -51,12 +51,15 @@
 
     # - name: debug compute_local_ip
       # debug: msg="{{ compute_dataplane_interface_name }}"
-
+## this task will fail if compute_local_ip is not defined previously;
+## i want this task to execute either way, if it is defined to use compute_local_ip value,
+## if compute_local_ip is not defined to not change the previous value in case of retry building the environment
     - name: Create config files
       win_template:
         src: "windows/{{ item.template }}"
         dest: "{{ item.config}}"
       with_items: "{{ services }}"
+      when: compute_local_ip is defined or compute_local_ip is not defined
       tags: create-configs
 
     - name: Create policy.json
