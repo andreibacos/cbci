@@ -47,7 +47,7 @@
 
     - name: Add dataplane interface in {{ data_bridge_ovs }}
       win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-port {{ data_bridge_ovs }} \"{{ compute_dataplane_interface_name }}\""
-      when: compute_dataplane_interface_name is not none
+      when: compute_dataplane_interface_name is defined
       tags: configure-ovs
 
     - name: Enable {{ data_bridge_ovs }} adapter
@@ -56,7 +56,7 @@
 
     - name: Add dataplane interface ip on {{ data_bridge_ovs }}
       win_shell: "New-NetIPAddress -IPAddress {{ compute_local_ip }} -InterfaceAlias {{ data_bridge_ovs }} -PrefixLength 22"
-      when: compute_local_ip is not none
+      when: compute_local_ip is defined
       tags: configure-ovs
 
     # - name: Create br-ethernet bridge in OVS
