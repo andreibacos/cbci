@@ -72,11 +72,12 @@ If (-not $check_mode) {
                 $result.log += "Found vmswitch " + $i.name + ", checking ManagementOS"
                 if ( $i.allowmanagementos -eq $management ) {
                     $result.log += "ManagementOS matches"
-                } else {
+                }
+				<#  else {
                     $result.log += "ManagementOS does not match, updating from " + $i.allowmanagementos + " to " + $management
                     Set-VMSwitch -Name $name -AllowManagementOS $management
                     $result.changed = $true
-                }
+                } #>
 
                 if ( $management ) {
                     $result.log += "ManagementOS is true, checking ip"
@@ -117,6 +118,7 @@ If (-not $check_mode) {
                 } else {
                     try {
                         New-VMSwitch -Name $name -NetAdapterName $adapter.interfacealias -AllowManagementOS $management
+						Get-VMSwitch
                         $result.interface_details.Add('adapter_name', $adapter.interfacealias)
 						$result.interface_details.Add('adapter_ip', $adapter.ipaddress)
 						$result.changed = $true
