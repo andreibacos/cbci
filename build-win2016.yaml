@@ -66,6 +66,11 @@
         dest: "{{ win_dir.etc }}\\policy.json"
       tags: create-configs
 
+    - name: Add "openstack/networking-hyperv" project to git_prep_projects
+      set_fact:
+        git_prep_projects: "{{ git_prep_projects }} + [ 'openstack/networking-hyperv' ]"
+      when: network_type == "hyperv"
+
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml
     - include: tasks/windows/install-pip.yaml
@@ -78,7 +83,7 @@
     
     - include: tasks/windows/configure-ovs.yaml
       with_items: "{{ vmswitches }}"
-      when: use_ovs
+      when: network_type == "ovs"
     
     - name: Update setuptools
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"

@@ -7,7 +7,6 @@ git_prep_projects:
   - openstack/compute-hyperv
   - openstack/os-win
   - openstack/os-brick
-#  - openstack/networking-hyperv
 
 services:
   - nova:
@@ -46,7 +45,6 @@ python_packages:
 compute_driver: compute_hyperv.driver.HyperVDriver
 data_bridge_ovs: br-ethernet
 win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
-use_ovs: True
 
 vmswitches:
   - name: "{{ data_bridge }}"
