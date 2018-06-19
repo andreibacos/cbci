@@ -15,7 +15,6 @@ zuul_head_only: True
 enable_tenant_vlans: false
 enable_tenant_tunnels: true
 q_ml2_tenant_network_type: vxlan
-neutron_agent_search_string: "Open vSwitch.*hv.*:-)"
 
 local_conf:
   enable_services:
