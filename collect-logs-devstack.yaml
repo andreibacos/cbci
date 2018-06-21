@@ -19,6 +19,12 @@
       when: job_type is defined
       tags: always
 
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ network_type }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ network_type }}"
+      failed_when: False
+      when: network_type is defined and job_type is not defined
+      tags: always
+
     - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}
       include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}"
       failed_when: False
