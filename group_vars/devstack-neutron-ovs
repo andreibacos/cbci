@@ -29,8 +29,6 @@ tempest_tests:
       tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_pause_unpause_server
       tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_reboot_server_hard
       tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_reboot_server_soft
-      tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_rebuild_server
-      tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_rebuild_server_in_stop_state
       tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_resize_server_confirm
       tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_resize_server_confirm_from_stopped
       tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_resize_server_revert
@@ -41,7 +39,6 @@ tempest_tests:
       tempest.scenario.test_minimum_basic.TestMinimumBasicScenario.test_minimum_basic_scenario
       tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
       tempest.scenario.test_network_basic_ops.TestNetworkBasicOps
-      tempest.scenario.test_network_v6.TestGettingAddress
       tempest.scenario.test_server_advanced_ops.TestServerAdvancedOps.test_server_sequence_suspend_resume
       tempest.scenario.test_server_basic_ops.TestServerBasicOps.test_server_basicops
       tempest.scenario.test_shelve_instance.TestShelveInstance.test_shelve_instance
@@ -53,7 +50,10 @@ tempest_tests:
       tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_create_ebs_image_and_check_boot
       tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_boot_pattern
 
-  excluded-tests:
+  excluded-tests: |
+      tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_rebuild_server
+	  tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_rebuild_server_in_stop_state
+	  tempest.scenario.test_network_v6.TestGettingAddress
 
   isolated-tests: |
       tempest.api.compute.admin.test_servers_negative.ServersAdminNegativeTestJSON.test_resize_server_using_overlimit_ram
