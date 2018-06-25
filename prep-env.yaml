@@ -12,6 +12,7 @@
     - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
       failed_when: False
+      when: job_type is defined
       tags: always
 
     - include: tasks/boot-instance.yaml
