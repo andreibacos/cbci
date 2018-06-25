@@ -47,14 +47,6 @@
     - include: tasks/windows/configure-smbshare.yaml
       when: smbshare is defined
 
-    - name: Set neutron hyperv agent service
-      set_fact: services={{ services + neutron_hyperv_agent }}
-      when: network_type == "hyperv"
-
-    - name: Set neutron ovs agent service
-      set_fact: services={{ services + neutron_ovs_agent }}
-      when: network_type == "ovs"
-
     - name: Configure services with AD user
       set_fact:
         service_username: "administrator@{{ ad_domain }}"
@@ -104,6 +96,14 @@
 
     - include: tasks/windows/enable-live-migration.yaml
       when: join_ad is defined and join_ad
+
+    - name: Set neutron hyperv agent service
+      set_fact: services={{ services + neutron_hyperv_agent }}
+      when: network_type == "hyperv"
+
+    - name: Set neutron ovs agent service
+      set_fact: services={{ services + neutron_ovs_agent }}
+      when: network_type == "ovs"
 
     - name: Configure services with AD user
       set_fact:
