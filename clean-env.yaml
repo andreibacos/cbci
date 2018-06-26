@@ -12,6 +12,13 @@
 
     - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
+      failed_when: False
+      tags: always
+      
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}"
+      when: network_type is defined and job_type is defined
       failed_when: False
       tags: always
 

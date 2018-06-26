@@ -1,14 +1,14 @@
 cherry_picks:
-  - project: openstack/tempest
-    path: "{{ devstack_dir.stack }}/tempest"
-    patches:
-      - refs/changes/49/383049/13
-      - refs/changes/28/384528/10
-      - refs/changes/13/433213/3
   - project: openstack-dev/devstack
     path: "{{ devstack_dir.devstack }}"
     patches:
       - refs/changes/25/473525/3
+#  - project: openstack/tempest
+#    path: "{{ devstack_dir.stack }}/tempest"
+#    patches:
+#      - refs/changes/49/383049/13
+#      - refs/changes/28/384528/10
+#      - refs/changes/13/433213/3
 
 tempest_tests:
   included-tests: |

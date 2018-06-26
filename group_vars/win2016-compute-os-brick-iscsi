@@ -4,7 +4,6 @@ git_prep_projects:
   - openstack/requirements
   - openstack/nova
   - openstack/neutron
-  - openstack/networking-hyperv
   - openstack/compute-hyperv
   - openstack/os-win
   - openstack/os-brick
@@ -17,14 +16,12 @@ services:
     config: "{{ win_dir.etc }}\\nova.conf"
     template: nova.conf
 
-  - neutron:
-    name: neutron-hyperv-agent
-    description: OpenStack Neutron Hyper-V Agent Service
-    binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
-    config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
-    template: neutron-hyperv-agent.conf
 
-#cherry_picks:
+cherry_picks:
+  - project: openstack/neutron
+    path: "{{ win_dir.build }}\\neutron"
+    patches:
+      - refs/changes/21/567621/6
 #  - project: openstack/cinder
 #    path: "{{ win_dir.build }}\\cinder"
 #    patches:
@@ -36,10 +33,15 @@ services:
 #      - refs/changes/41/403641/4
 #      - refs/changes/19/426719/4
 
+python_packages:
+  - ovs
+
 compute_driver: compute_hyperv.driver.HyperVDriver
+data_bridge_ovs: br-ethernet
+win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
 
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
-    management: True
+    management: False
 

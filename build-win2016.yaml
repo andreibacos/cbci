@@ -4,6 +4,23 @@
 
     - include: tasks/windows/create-folders.yaml
 
+    - name: Disable firewall for Domain, Public and Private profiles
+      win_firewall:
+        state: disabled
+        profiles:
+        - Domain
+        - Private
+        - Public
+      tags: disable_firewall
+
+    - name: Set neutron hyperv agent service
+      set_fact: services={{ services + neutron_hyperv_agent }}
+      when: network_type == "hyperv"
+
+    - name: Set neutron ovs agent service
+      set_fact: services={{ services + neutron_ovs_agent }}
+      when: network_type == "ovs"
+
     - name: Create services and/or stop them if they are running
       win_service:
         name: "{{ item.name }}"
@@ -15,19 +32,6 @@
       with_items: "{{ services }}"
       tags: create-services
 
-    - name: Create config files
-      win_template:
-        src: "windows/{{ item.template }}"
-        dest: "{{ item.config}}"
-      with_items: "{{ services }}"
-      tags: create-configs
-  
-    - name: Create policy.json
-      win_template:
-        src: "windows/policy.json"
-        dest: "{{ win_dir.etc }}\\policy.json"
-      tags: create-configs
- 
     - name: Create vmswitches
       cb_vmswitch:
         name: "{{ item.name }}"
@@ -36,7 +40,35 @@
         state: present
       with_items: "{{ vmswitches }}"
       when: vmswitches is defined
+      register: op
       tags: create-vmswitch
+
+    - name: Set compute_local_ip variable
+      set_fact: compute_local_ip={{ op.results[0].interface_details.adapter_ip }}
+      when: op.results[0].interface_details.adapter_ip is defined
+
+    - name: Set compute_dataplane_interface_name variable
+      set_fact: compute_dataplane_interface_name={{ op.results[0].interface_details.adapter_name }}
+      when: op.results[0].interface_details.adapter_name is defined
+
+    - name: Create config files
+      win_template:
+        src: "windows/{{ item.template }}"
+        dest: "{{ item.config}}"
+      with_items: "{{ services }}"
+      failed_when: False
+      tags: create-configs
+
+    - name: Create policy.json
+      win_template:
+        src: "windows/policy.json"
+        dest: "{{ win_dir.etc }}\\policy.json"
+      tags: create-configs
+
+    - name: Add "openstack/networking-hyperv" project to git_prep_projects
+      set_fact:
+        git_prep_projects: "{{ git_prep_projects }} + [ 'openstack/networking-hyperv' ]"
+      when: network_type == "hyperv"
 
     - include: tasks/windows/install-utils.yaml
     - include: tasks/windows/install-python.yaml
@@ -48,8 +80,15 @@
     - include: tasks/windows/install-zuul.yaml
     - include: tasks/windows/prepare-git-repos.yaml
     
+    - include: tasks/windows/configure-ovs.yaml
+      with_items: "{{ vmswitches }}"
+      when: network_type == "ovs"
+    
     - name: Update setuptools
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U setuptools"
+
+    - name: Change pbr version from 4.0.0 to 3.1.1
+      win_shell: '(gc {{ win_dir.build }}\\requirements\\upper-constraints.txt) -replace "^pbr.*", "pbr===3.1.1" | Set-Content {{ win_dir.build }}\\requirements\\upper-constraints.txt'
 
     - name: Installing pip packages
       win_shell: "pip install -c {{ win_dir.build }}\\requirements\\upper-constraints.txt -U {{ python_packages | join(' ') }}"

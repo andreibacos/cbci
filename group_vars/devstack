@@ -18,6 +18,7 @@ devstack_dir:
   zuul: '/opt/stack/zuul-venv'
 
 devstack_repo: https://github.com/openstack-dev/devstack.git
+neutron_agent_search_string: "Open vSwitch.*hv.*:-)"
 
 keystonerc: |
   export OS_PROJECT_DOMAIN_NAME=Default

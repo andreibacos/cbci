@@ -37,14 +37,9 @@ cherry_picks:
 
 compute_driver: compute_hyperv.driver.HyperVDriver
 
-python_packages:
-  - ovs
-
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
     management: False
 
-data_bridge_ovs: br-ethernet
 win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
-ovs_msi_url: https://cloudbase.it/downloads/openvswitch-hyperv-2.7.0-certified.msi

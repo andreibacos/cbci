@@ -13,15 +13,22 @@
 
     - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
       failed_when: False
       tags: always
 
+    - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}
+      include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}"
+      when: network_type is defined and job_type is defined
+      failed_when: False
+      tags: always
+      
     # Run sanity checks as early as possible
     - include: tasks/windows/sanity-checks.yaml
     - name: Install FS-iSCSITarget-Server
       win_feature:
         name: FS-iSCSITarget-Server
         state: present
-      when: job_type == "iscsi"
+      when: job_type == "iscsi" and job_type is defined
 
     - include: build-win2016.yaml
