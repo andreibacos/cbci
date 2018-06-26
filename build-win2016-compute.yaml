@@ -29,6 +29,6 @@
       win_feature:
         name: FS-iSCSITarget-Server
         state: present
-      when: job_type == "iscsi"
+      when: job_type == "iscsi" and job_type is defined
 
     - include: build-win2016.yaml
