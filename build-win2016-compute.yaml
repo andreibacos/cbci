@@ -13,6 +13,7 @@
 
     - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}"
+      when: job_type is defined
       failed_when: False
       tags: always
 
