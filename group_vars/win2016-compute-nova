@@ -1,13 +1,12 @@
 join_ad: False
-
+### MUST ENSURE THAT openstack/requirements PROJECT IS ALWAYS ON THE FIRST POSITION in git_prep_projects VARIABLE
 git_prep_projects:
   - openstack/requirements
   - openstack/nova
   - openstack/neutron
   - openstack/compute-hyperv
   - openstack/os-win
-  - openstack/os-brick
-
+  
 services:
   - nova:
     name: nova-compute
@@ -16,12 +15,7 @@ services:
     config: "{{ win_dir.etc }}\\nova.conf"
     template: nova.conf
 
-
-cherry_picks:
-  - project: openstack/neutron
-    path: "{{ win_dir.build }}\\neutron"
-    patches:
-      - refs/changes/21/567621/6
+#cherry_picks:
 #  - project: openstack/cinder
 #    path: "{{ win_dir.build }}\\cinder"
 #    patches:
@@ -33,15 +27,19 @@ cherry_picks:
 #      - refs/changes/41/403641/4
 #      - refs/changes/19/426719/4
 
-python_packages:
-  - ovs
+
+## commented cherry pick used only for master branch
+cherry_picks:
+  - project: openstack/neutron
+    path: "{{ win_dir.build }}\\neutron"
+    patches:
+      - refs/changes/21/567621/6
 
 compute_driver: compute_hyperv.driver.HyperVDriver
-data_bridge_ovs: br-ethernet
-win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
 
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
     management: False
 
+win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"

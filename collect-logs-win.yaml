@@ -25,6 +25,18 @@
       when: job_type is defined
       tags: always
 
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ network_type }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ network_type }}"
+      failed_when: False
+      when: network_type is defined and job_type is not defined
+      tags: always
+
+    - name: Include variables from group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}
+      include_vars: "group_vars/devstack-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}"
+      failed_when: False
+      when: job_type is defined and network_type is defined
+      tags: always
+
     - name: Include variables from group_vars/win2016-compute
       include_vars: "group_vars/win2016-compute"
       failed_when: False
@@ -40,6 +52,12 @@
       failed_when: False
       tags: always
 
+    - name: Include variables from group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}
+      include_vars: "group_vars/win2016-compute-{{ zuul_project | basename }}-{{ job_type }}"
+      failed_when: False
+      when: network_type is defined
+      tags: always
+      
     - name: Include variables from job_vars/{{ zuul_project | basename }}
       include_vars: "job_vars/{{ zuul_project | basename }}"
       failed_when: False
@@ -48,6 +66,12 @@
     - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
       include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}"
       failed_when: False
+      tags: always
+      
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}"
+      failed_when: False
+      when: network_type is defined
       tags: always
 
     - name: Get log files

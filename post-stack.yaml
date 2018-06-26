@@ -15,6 +15,12 @@
       failed_when: False
       tags: always
 
+    - name: Include variables from job_vars/{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}
+      include_vars: "job_vars/{{ zuul_project | basename }}-{{ job_type }}-{{ network_type }}"
+      failed_when: False
+      when: network_type is defined
+      tags: always
+      
     - name: Configure compute node trunk
       include_tasks: tasks/configure-compute-trunk.yaml
       with_items: "{{ groups['all'] }}"
@@ -30,6 +36,11 @@
       when: job_type is defined
       tags: always
 
+    - name: Include additional variables based on job_type and network_type
+      include_vars: "group_vars/win2016-cinder-{{ job_type }}-{{ network_type }}"
+      when: network_type is defined
+      tags: always
+      
     - include: tasks/windows/join-ad.yaml
       when: join_ad is defined and join_ad
 
@@ -85,6 +96,14 @@
 
     - include: tasks/windows/enable-live-migration.yaml
       when: join_ad is defined and join_ad
+
+    - name: Set neutron hyperv agent service
+      set_fact: services={{ services + neutron_hyperv_agent }}
+      when: network_type == "hyperv"
+
+    - name: Set neutron ovs agent service
+      set_fact: services={{ services + neutron_ovs_agent }}
+      when: network_type == "ovs"
 
     - name: Configure services with AD user
       set_fact:

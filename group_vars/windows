@@ -19,6 +19,22 @@ win_dir:
   pip: 'C:\ProgramData\pip'
   instances: 'C:\openstack\instances'
 
+neutron_ovs_agent:
+  - neutron:
+    name: neutron-ovs-agent
+    description: OpenStack Neutron OVS Agent Service
+    binary: "{{ win_dir.python }}\\scripts\\neutron-openvswitch-agent.exe"
+    config: "{{ win_dir.etc }}\\neutron-ovs-agent.conf"
+    template: neutron-ovs-agent.conf
+
+neutron_hyperv_agent:
+  - neutron:
+    name: neutron-hyperv-agent
+    description: OpenStack Neutron Hyper-V Agent Service
+    binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
+    config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
+    template: neutron-hyperv-agent.conf
+
 win_utils_bin_archive_url: http://10.100.0.9/ci/utils_bin.zip
 win_python_archive_url: http://10.100.0.9/ci/python.zip
 win_git_installer_url: http://10.100.0.9/ci/Git-2.13.2-64-bit.exe
@@ -31,3 +47,4 @@ dns_servers:
   - 8.8.8.8
   - 4.4.4.4
 join_ad: True
+ovs_msi_url: https://cloudbase.it/downloads/openvswitch-hyperv-2.7.0-certified.msi

@@ -1,0 +1,60 @@
+---
+    - name: Install OVS
+      win_package:
+        path: "{{ ovs_msi_url }}"
+        productid: '{A5CE0CD6-AABF-42AB-B52D-077492FF41A6}'
+        ensure: present
+      tags: configure-ovs
+
+    - name: Expose tcp port for OVS for remote control
+      win_service:
+        name: ovsdb-server
+        path: '"C:\Program Files\Cloudbase Solutions\Open vSwitch\bin\ovsdb-server.exe" --log-file="C:\Program Files\Cloudbase Solutions\Open vSwitch\logs\ovsdb-server.log" --pidfile --service --unixctl="C:\ProgramData\openvswitch\ovsdb-server.ctl" --remote=punix:"C:\ProgramData\openvswitch\db.sock" --remote=ptcp:6640 --remote=db:Open_vSwitch,Open_vSwitch,manager_options "C:\Program Files\Cloudbase Solutions\Open vSwitch\conf\conf.db"'
+
+    - name: Restart ovsdb-server
+      win_service:
+        name: "ovsdb-server"
+        state: restarted
+        force_dependent_services: yes
+      tags: configure-ovs
+
+    - name: Restart ovs-vswitchd
+      win_service:
+        name: "ovs-vswitchd"
+        state: restarted
+        force_dependent_services: yes
+      tags: configure-ovs
+
+    - name: Check if OVS extension is installed
+      win_shell: 'Get-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
+      register: result
+      tags: configure-ovs
+
+    - name: Enable OVS extension on {{ item.name }}
+      win_shell: 'Enable-VMSwitchExtension -VMSwitchName {{ item.name }} -Name "Cloudbase Open vSwitch Extension"'
+      when: result.rc == 0
+      tags: configure-ovs
+
+    - name: Check if {{ data_bridge_ovs }} exists
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 show | Select-String -Pattern \"{{ data_bridge_ovs }}\""
+      register: result
+      tags: configure-ovs
+
+    - name: Add {{ data_bridge_ovs }} in OVS
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-br {{ data_bridge_ovs }}"
+      when: result.stdout == ""
+      tags: configure-ovs
+
+    - name: Add dataplane interface in {{ data_bridge_ovs }}
+      win_shell: "ovs-vsctl --db=tcp:127.0.0.1:6640 add-port {{ data_bridge_ovs }} \"{{ compute_dataplane_interface_name }}\""
+      when: compute_dataplane_interface_name is defined
+      tags: configure-ovs
+
+    - name: Enable {{ data_bridge_ovs }} adapter
+      win_shell: "Enable-NetAdapter {{ data_bridge_ovs }}"
+      tags: configure-ovs
+
+    - name: Add dataplane interface ip on {{ data_bridge_ovs }}
+      win_shell: "New-NetIPAddress -IPAddress {{ compute_local_ip }} -InterfaceAlias {{ data_bridge_ovs }} -PrefixLength 22"
+      when: compute_local_ip is defined
+      tags: configure-ovs

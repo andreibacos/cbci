@@ -5,7 +5,6 @@ git_prep_projects:
   - openstack/cinder
   - openstack/nova
   - openstack/neutron
-  - openstack/networking-hyperv
   - openstack/compute-hyperv
   - openstack/os-win
   - openstack/os-brick
@@ -18,13 +17,6 @@ services:
     config: "{{ win_dir.etc }}\\nova.conf"
     template: nova.conf
 
-  - neutron:
-    name: neutron-hyperv-agent
-    description: OpenStack Neutron Hyper-V Agent Service
-    binary: "{{ win_dir.python }}\\scripts\\neutron-hyperv-agent.exe"
-    config: "{{ win_dir.etc }}\\neutron-hyperv-agent.conf"
-    template: neutron-hyperv-agent.conf
-
   - cinder:
     name: cinder-volume
     description: OpenStack Cinder Volume Service
@@ -34,12 +26,17 @@ services:
 
 python_packages:
   - pymysql
+  - ovs
 
 cherry_picks:
   - project: openstack/cinder
     path: "{{ win_dir.build }}\\cinder"
     patches:
       - refs/changes/93/539593/1
+  - project: openstack/neutron
+    path: "{{ win_dir.build }}\\neutron"
+    patches:
+      - refs/changes/21/567621/6
 #  - project: openstack/os-win
 #    path: "{{ win_dir.build }}\\os-win"
 #    patches:
@@ -47,11 +44,13 @@ cherry_picks:
 #      - refs/changes/19/426719/4
 
 compute_driver: compute_hyperv.driver.HyperVDriver
+data_bridge_ovs: br-ethernet
+win2016_compute_node_ip: "{{ groups['win2016-compute'][0] }}"
 
 vmswitches:
   - name: "{{ data_bridge }}"
     subnet: "{{ data_network }}"
-    management: True
+    management: False
 
 volume_driver: cinder.volume.drivers.windows.smbfs.WindowsSmbfsDriver
 smbshare: 'c:\smbshare'

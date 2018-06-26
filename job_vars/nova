@@ -1,0 +1,20 @@
+vms:
+  - devstack: 
+    name: "dv-nova-{{ zuul_change }}-{{ zuul_patchset }}"
+    image: ubuntu1604
+    flavor: devstack
+    inventory_group: devstack
+    additional_params: 'ansible_ssh_private_key_file=/home/jenkins-slave/.ssh/id_rsa.pem ansible_ssh_common_args="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"'
+    userdata: ""
+  - hv2016-compute: 
+    name: "hv-nova-{{ zuul_change }}-{{ zuul_patchset }}"
+    image: win2016-hypervrole
+    flavor: win2016hv
+    inventory_group: win2016-compute
+    additional_params: "ansible_winrm_cert_pem=/home/jenkins-slave/ssl/ssl_winrm.crt ansible_winrm_cert_key_pem=/home/jenkins-slave/ssl/ssl_winrm.key ansible_winrm_transport=certificate ansible_ssh_user=administrator ansible_connection=winrm ansible_winrm_server_cert_validation=ignore ansible_ssh_port=5986"
+    userdata: "{{ lookup('file', '/home/jenkins-slave/ssl/ssl_winrm.crt') }}"
+
+win_crt: /home/jenkins-slave/ssl/ssl_winrm.crt
+win_key: /home/jenkins-slave/ssl/ssl_winrm.key
+log_key: /home/jenkins-slave/.ssh/id_rsa_log.pem
+log_path: /tmp/build_logs/{{ zuul_change }}-{{ zuul_patchset }}
